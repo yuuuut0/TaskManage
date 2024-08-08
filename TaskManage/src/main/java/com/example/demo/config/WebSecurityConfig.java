@@ -53,7 +53,7 @@ public class WebSecurityConfig {
 			.formLogin(
 				login -> login.loginPage("/login")
 					.usernameParameter("userId")
-					.defaultSuccessUrl("/home"))
+					.defaultSuccessUrl("/loginSuccess"))
 			
 			.logout(logout -> logout.logoutSuccessUrl("/login"));
 		

@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.time.LocalDateTime;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,7 @@ public class SignupService {
 		
 		dto.setPassword(passwordEncoder.encode(dto.getPassword()));
 		var userInfo = mapper.map(dto, UserInfo.class);
+		userInfo.setLastActiveAt(LocalDateTime.now());
 		repository.save(userInfo);
 		return SignupResult.SUCCEED;
 	}
