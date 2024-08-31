@@ -5,7 +5,12 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -16,16 +21,24 @@ import lombok.Data;
 @Entity
 @Table(name = "user_info")
 @Data
-public class UserInfo {
+public class User {
 
 	/** ユーザーID */
 	@Id
+	@Size(max = 30)
+	@Pattern(regexp = "^[a-zA-z0-9._-]+$")
 	@Column(name = "user_id")
 	private String userId;
 	
 	/** ユーザーネーム */
-	@Column(name = "user_name")
-	private String userName;
+	@NotBlank
+	@Size(max = 30)
+	private String username;
+	
+	/** ハンドルネーム */
+	@NotBlank
+	@Size(max = 4)
+	private String handle;
 	
 	/** パスワード */
 	private String password;
@@ -35,6 +48,7 @@ public class UserInfo {
 	private LocalDateTime lastActiveAt;
 	
 	/** 参画プロジェクトID */
-	@Column(name = "project_id")
-	private int projectId;
+	@ManyToOne
+	@JoinColumn(name = "project_id")
+	private Project project;
 }

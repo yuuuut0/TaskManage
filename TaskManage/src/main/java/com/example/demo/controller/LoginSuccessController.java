@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.example.demo.repository.UserInfoRepository;
+import com.example.demo.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class LoginSuccessController {
 
 	/** ユーザー情報repository */
-	private final UserInfoRepository repository;
+	private final UserRepository repository;
 	
 	@GetMapping("/loginSuccess")
 	public String view(@AuthenticationPrincipal UserDetails userDetails) {

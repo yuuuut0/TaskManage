@@ -8,13 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.entity.UserInfo;
+import com.example.demo.entity.User;
 
 @Repository
-public interface UserInfoRepository extends JpaRepository<UserInfo, String>{
+public interface UserRepository extends JpaRepository<User, String>{
 
 	@Modifying
 	@Transactional
-	@Query("UPDATE UserInfo e SET e.lastActiveAt = ?1 WHERE e.userId = ?2")
+	@Query("UPDATE User u SET u.lastActiveAt = ?1 WHERE u.userId = ?2")
 	void updareLastActiveAt(LocalDateTime activeAt, String userId);
 }

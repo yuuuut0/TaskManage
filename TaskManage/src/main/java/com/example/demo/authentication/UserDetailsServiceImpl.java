@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import com.example.demo.repository.UserInfoRepository;
+import com.example.demo.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
 	/** ユーザー情報デーブル repository */
-	private final UserInfoRepository repository;
+	private final UserRepository repository;
 	
 	/**
 	 * 引数のユーザーIDIDを使ってDBへユーザー検索を行い、該当データから後の認証処理で使用するユーザー情報を生成します。

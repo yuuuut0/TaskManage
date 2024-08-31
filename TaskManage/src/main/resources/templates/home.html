@@ -1,13 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
 	<meta charset="UTF-8">
-	<title>Insert title here</title>
+	<title>home</title>
 </head>
 
 <body>
 	ホームページ
+	
+	<a th:href="@{/newProject}">プロジェクト作成</a>
+	
+	
+	
+	
 	<form th:action="@{/logout}" method="post">
 		<input type="submit" class="btn btn-light" value="ログアウト">
 	</form>

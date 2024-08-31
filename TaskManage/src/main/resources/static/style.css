@@ -1,0 +1,214 @@
+/*
+common
+ */
+.w-30{
+  width: 30% !important;
+}
+
+.fs-7{
+  font-size: 0.8rem!important;
+}
+
+.lh-2{
+  line-height: 1.5rem!important;
+}
+
+/* 
+navbar
+ */
+.navbar{
+  z-index: 997;
+}
+.nav-heading {
+  font-size: 11px;
+  color: #899bbd;
+  /* margin: 10px 0 5px 15px; */
+}
+
+
+/* 
+sidebar
+ */
+.toggle-sidebar .sidebar {
+  left: -250px;
+}
+
+.toggle-sidebar-btn:hover{
+  cursor: pointer;
+}
+
+.sidebar {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  z-index: 996;
+  transition: all 0.3s;
+  padding: 20px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #aab7cf transparent;
+  box-shadow: 0px 0px 5px rgba(1, 41, 112, 0.1);
+  background-color: #fff;
+}
+
+.sidebar-alert{
+  font-size: 0.8rem;
+  padding-right: 0;
+}
+
+/* 
+modal
+ */
+.modal-label{
+  font-size: 11px;
+  color: #899bbd;
+  text-align: center;
+  margin-top: 0.67rem;
+}
+
+/* 
+main
+ */
+#main{
+  width: calc(100% - 250px);
+  margin-left: 250px;
+  transition: all 0.3s;
+  overflow: auto;
+}
+
+.toggle-sidebar #main{
+  width: 100%;
+  margin-left: 0px;
+  padding: 0 2rem;
+}
+
+/* 
+table
+ */
+.col-50 {
+  width: 50%;
+}
+.col-width-info {
+  width: 10px;
+}
+.col-width-icon {
+  width: 70px;
+}
+.col-width-time{
+  min-width: 7rem;
+}
+.col-width-user{
+  min-width: 80px;
+}
+.table-heading {
+  font-size: 11px;
+  color: #899bbd !important;
+  /* margin: 10px 0 5px 15px; */
+}
+td{
+  position: relative;
+}
+
+
+
+/* 
+スクロール
+*/
+/* .scrollable-container{
+} */
+
+.scrollable-content{
+  white-space: nowrap;
+  display: inline-block;
+  max-width: calc(100% - 52px);
+  position: absolute;
+  overflow-x: auto;
+  top: 0px;
+  left: 20px;
+}
+.scrollable-content.sub{
+  max-width: calc(100% - 35px);
+  left: 0px;
+}
+/* .scroll-container のスクロールバーのカスタマイズ */
+.scrollable-content::-webkit-scrollbar {
+  height: 4px;  /* スクロールバーの幅を小さく設定 */
+  display: none;
+}
+
+.scrollable-content-hover::-webkit-scrollbar {
+  display: block!important;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+  background: transparent;  /* トラックの背景色を透明に */
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2); /* 半透明のつまみ */
+  border-radius: 10px;  /* つまみを丸く */
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4); /* ホバー時の色 */
+}
+
+
+
+
+/* 
+select
+ */
+
+
+/* 
+progress
+*/
+.progress-background {
+  position: relative;
+  /* overflow: hidden; */
+  /* color: white; */
+}
+
+.progress-background .progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  --bs-progress-border-radius: 0;
+  opacity: 0.3;
+}
+
+.progress-background .content {
+  position: relative;
+  z-index: 1;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.progress-bar{
+  background-color: #a4f9a6;
+}
+
+
+/* 
+btn
+ */
+.btn-new-task{
+  margin-top: 0.1rem;
+  --bs-btn-border-radius: 0.7rem;
+  --bs-btn-padding-y: 0.0rem;
+  --bs-btn-padding-x: 0.2rem;
+  --bs-btn-font-size: 0.7rem;
+}
+.btn-add{
+  margin-left: 0.2rem;
+  --bs-btn-border-radius: 0.8rem;
+  --bs-btn-padding-y: 0.1rem;
+  --bs-btn-padding-x: 0.4rem;
+  --bs-btn-font-size: 0.8rem;
+}
+
