@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,6 +17,10 @@ public class BeanDefine {
 	
 	@Bean
 	ModelMapper mapper() {
-		return new ModelMapper();
+		var modelMapper = new ModelMapper();
+		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        modelMapper.getConfiguration().setFullTypeMatchingRequired(true);
+		return modelMapper;
 	}
+	
 }

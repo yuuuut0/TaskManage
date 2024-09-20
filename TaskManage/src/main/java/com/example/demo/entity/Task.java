@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * タスクテーブルentity
@@ -22,6 +23,7 @@ import lombok.Data;
 @Entity
 @Table(name = "tasks")
 @Data
+@NoArgsConstructor
 public class Task {
 
 	/** タスクID */
@@ -32,21 +34,21 @@ public class Task {
 	
 	/** todo */
 	@NotBlank
-	@Size(max = 30)
+	@Size(max = 50)
 	private String title;
 	
 	/** todo補足 */
 	@Size(max = 300)
-	private String descliption;
+	private String description;
 	
 	/** 親タスク */
 	@Column(name = "parent_id")
-	private String parentId;
+	private Integer parentId;
 	
 	/** 担当ユーザー */
 	@ManyToOne
 	@JoinColumn(name = "assigned_user_id")
-	private User assignedUser;
+	private UserInfo assignedUser;
 	
 	/** 完了済みのサブタスク数 */
 	@Column(name = "sub_completed")
@@ -57,18 +59,18 @@ public class Task {
 	private int subTotal;
 	
 	/** 状態 */
-	private boolean state;
+	@Column(name = "completed_frg")
+	private boolean completedFrg;
 	
 	/** 優先度 */
-	private int priority;
+	private byte priority;
 	
 	/** 締め切り */
 	private LocalDateTime deadline;
 	
 	/** プロジェクトID */
-	@ManyToOne
-	@JoinColumn(name = "project_id")
-	private Project project;
+	@Column(name = "project_id")
+	private String projectId;
 	
 	/** 作成日時 */
 	@Column(name = "created_at")
@@ -81,4 +83,9 @@ public class Task {
 	/** 完了日時 */
 	@Column(name = "completed_at")
 	private LocalDateTime completedAt;
+	
+	
+	public Task(int taskId) {
+		this.taskId = taskId;
+	}
 }

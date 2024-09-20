@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <div th:fragment="sidebar">
+      <!-- 
+      modal
+      -->
+      <div
+        class="modal modal-lg fade"
+        id="modal-project"
+        tabindex="-1"
+        aria-labelledby="modal-projectLabel"
+        aria-hidden="true"
+        th:if="${nowProjectInfo != null}"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <div
+                class="d-flex justify-content-between align-items-center w-100"
+              >
+                <h1 class="modal-title fs-5" id="modal-projectLabel">
+                  プロジェクト詳細
+                </h1>
+                <button
+                  type="button"
+                  class="btn me-2"
+                  id="edit-trigger-project"
+                  data-bs-toggle="button"
+                  th:if="${nowProjectInfo.leaderId.equals(#authentication.principal.username)}"
+                >
+                  <i class="bi bi-pencil-square text-secondary"></i>
+                </button>
+              </div>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form
+                th:action="@{/project}"
+                method="post"
+                id="project-update"
+                th:object="${editProjectForm}"
+              >
+              <input name="update" hidden></input>
+                <div class="row mb-3">
+                  <label for="edit-project-id" class="col-sm-2 modal-label"
+                    >project ID</label
+                  >
+                  <div class="col-sm-10">
+                    <input
+                      type="text"
+                      class="form-control-plaintext"
+                      id="edit-project-id"
+                      name="projectId"
+                      th:value="${nowProjectInfo.projectId}"
+                    />
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="edit-name" class="col-sm-2 modal-label"
+                    >name</label
+                  >
+                  <div class="col-sm-10">
+                    <input
+                      type="text"
+                      class="form-control-plaintext edit"
+                      id="edit-name"
+                      th:field="*{name}"
+                    />
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="edit-description" class="col-sm-2 modal-label"
+                    >description</label
+                  >
+                  <div class="col-sm-10">
+                    <textarea
+                      class="form-control-plaintext edit"
+                      id="edit-description"
+                      th:field="*{description}"
+                      rows="3"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="my-4 ms-4">
+                  <hr  />
+                </div>
+                <div class="row mb-3">
+                  <label class="col-sm-2 modal-label">first task</label>
+                  <div class="col-sm-10">
+                    <div class="progress-background">
+                      <div class="progress">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          th:style="'width: ' + ${nowProjectInfo.progress} + '%;'"
+                          th:attr="aria-valuenow=${nowProjectInfo.progress}"
+                        ></div>
+                      </div>
+                      <div
+                        class="d-flex justify-content-between align-items-center content"
+                      >
+                        <input
+                          type="text"
+                          class="form-control-plaintext"
+                          id="edit-first-task"
+                          th:field="*{title}"
+                        />
+                        <span
+                          class="nav-heading me-2"
+                          th:text="|${nowProjectInfo.progress}%|"
+                        ></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label
+                    for="edit-task-description"
+                    class="col-sm-2 modal-label"
+                    >task description</label
+                  >
+                  <div class="col-sm-10">
+                    <textarea
+                      class="form-control-plaintext edit"
+                      id="edit-task-description"
+                      th:field="*{taskDescription}"
+                      rows="3"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="form-deadline" class="col-sm-2 modal-label"
+                    >deadline</label
+                  >
+                  <div class="col-sm-10">
+                    <input
+                      type="datetime-local"
+                      class="form-control-plaintext edit"
+                      id="edit-deadline"
+                      th:field="*{deadline}"
+                      disabled
+                    />
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="edit-leader" class="col-sm-2 modal-label">leader</label>
+                  <div class="col-sm-10">
+                    <div class="input-group search-form">
+                      <select
+                        class="form-control-plaintext search-select edit"
+                        name="leaderId"
+                        disabled
+                      >
+                        <option
+                          id="edit-leader-selected"
+                          th:value="${nowProjectInfo.leaderId}"
+                          th:text="${nowProjectInfo.leaderName}"
+                          selected
+                        ></option>
+                        <option
+                          th:each="member : ${memberList}"
+                          th:value="${member.userId}"
+                          th:text="${member.handle}"
+                        ></option>
+                      </select>
+                      <input
+                        class="form-control search-input"
+                        type="text"
+                        placeholder="all"
+                        hidden
+                      />
+                      <button
+                        class="btn btn-outline-primary btn-sm search-button"
+                        type="button"
+                        hidden
+                      >
+                        検索
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-sm-2 modal-label">members</label>
+                  <div class="col-sm-10">
+                    <input
+                      type="text"
+                      class="form-control-plaintext"
+                      th:value="${nowProjectInfo.members}"
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <label class="col-sm-2 modal-label">作成日時</label>
+                  <div class="col-sm-10">
+                    <input
+                      type="datetime-local"
+                      class="form-control-plaintext"
+                      th:value="${nowProjectInfo.createdAt}"
+                      disabled
+                    />
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-sm-2 modal-label">更新日時</label>
+                  <div class="col-sm-10">
+                    <input
+                      type="datetime-local"
+                      class="form-control-plaintext"
+                      th:value="${nowProjectInfo.updatedAt}"
+                      disabled
+                    />
+                  </div>
+                </div>
+              </form>
+
+              <div class="text-center">
+                <a
+                  class="text-secondary mb-3"
+                  type="button"
+                  id="code-trigger"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseEditCode"
+                  aria-expanded="false"
+                  aria-controls="collapseEditCode"
+                >
+                  project codeを忘れた場合
+                </a>
+              </div>
+
+              <div class="collapse" id="collapseEditCode">
+                <form th:action="@{/project}" method="post">
+                  <div class="row mb-3">
+                    <label class="col-sm-2 modal-label">project code</label>
+                    <div class="col-sm-10">
+                      <div class="input-group">
+                        <input
+                          type="password"
+                          class="form-control edit-code"
+                          name="projectCode"
+                          disabled
+                        />
+                        <button
+                          type="button"
+                          class="btn btn-outline-secondary"
+                          id="password-toggle"
+                          data-bs-toggle="button"
+                        >
+                          <i class="bi bi-eye"></i>
+                        </button>
+                      </div>
+                      <div class="form-text">
+                        更新後は確認することができません。
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-center">
+                    <button
+                      type="submit"
+                      id="code-update-btn"
+                      class="btn btn-outline-primary"
+                    >
+                      Project Code を更新する
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+              <div>
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  id="project-update-btn"
+                  hidden
+                >
+                  更新
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  id="project-delete-btn"
+                  data-bs-target="#deleteProjectModal"
+                  data-bs-toggle="modal"
+                  hidden
+                >
+                  削除
+                </button>
+              </div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="modal fade"
+        id="deleteProjectModal"
+        aria-hidden="true"
+        tabindex="-1"
+        th:if="${nowProjectInfo != null}"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5">※注意</h1>
+            </div>
+            <div class="modal-body">
+              プロジェクトを削除すると、関連するタスクも削除されます。
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+              <form th:action="@{/project}" method="post">
+                <button
+                  class="btn btn-danger"
+                  name="delete"
+                  th:value="${nowProjectInfo.projectId}"
+                >
+                  削除
+                </button>
+              </form>
+              <button
+                class="btn btn-secondary"
+                data-bs-target="#modal-project"
+                data-bs-toggle="modal"
+              >
+                close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 
+	
+      sidebar
+      
+      -->
+      <aside class="sidebar" id="sidebar">
+        <div
+          class="alert alert-dismissible fade show sidebar-alert"
+          role="alert"
+          th:classappend="|${sidebarAlert.error?'alert-danger':'alert-info'}|"
+          th:if="${sidebarAlert != null}"
+        >
+          <div th:text="${sidebarAlert.message}"></div>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="container-fluid">
+          <ul class="navbar-nav">
+            <!-- 
+
+					project
+				
+				-->
+            <li class="nav-heading d-flex justify-content-between">
+              選択中のプロジェクト
+              <a
+                class="nav-heading"
+                type="button"
+                id="project-info-btn"
+                data-bs-toggle="modal"
+                data-bs-target="#modal-project"
+                th:if="${nowProjectInfo != null}"
+                th:attr="
+                  data-name=${nowProjectInfo.name},
+                  data-description=${nowProjectInfo.description},
+                  data-first-task=${nowProjectInfo.firstTask},
+                  data-task-description=${nowProjectInfo.taskDescription},
+                  data-deadline=${nowProjectInfo.deadline}
+                "
+              >
+                <i class="bi bi-info-circle"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link dropdown-toggle align-items-center d-inline-block"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                th:text="${nowProjectInfo != null ? nowProjectInfo.name : 'No Project Info'}"
+              ></a>
+              <ul class="dropdown-menu">
+                <li th:each=" project : ${joinedProjectList}">
+                  <a
+                    class="dropdown-item"
+                    th:href="@{/user/{id}(id=${project.projectId})}"
+                    th:text="${project.name}"
+                  ></a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <div class="d-flex align-items-center">
+                <a
+                  th:href="@{/newProject}"
+                  class="btn btn-outline-primary btn-add"
+                >
+                  new
+                </a>
+              </div>
+            </li>
+            <li class="nav-item">
+              <hr />
+            </li>
+
+            <!-- 
+
+					  taskList
+
+				    -->
+            <li class="nav-heading d-flex justify-content-between">
+              list
+              <a
+                class="nav-heading"
+                data-bs-toggle="collapse"
+                href="#collapseExample"
+                role="button"
+                aria-expanded="false"
+                aria-controls="collapseExample"
+              >
+                <i class="bi bi-chevron-down"></i>
+              </a>
+            </li>
+            <div class="collapse show" id="collapseExample">
+              <li class="nav-item" th:each=" parentTask : ${parentTaskLabel}">
+                <a
+                  class="nav-link"
+                  th:href="'#' + ${parentTask.taskId}"
+                  th:text="${parentTask.title}"
+                ></a>
+              </li>
+            </div>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </body>
+</html>

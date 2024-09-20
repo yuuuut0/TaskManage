@@ -5,11 +5,14 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * プロジェクトテーブルentity
@@ -19,6 +22,7 @@ import lombok.Data;
 @Entity
 @Table(name = "projects")
 @Data
+@NoArgsConstructor
 public class Project {
 
 	/** プロジェクトID */
@@ -40,11 +44,24 @@ public class Project {
 	@Size(max = 300)
 	private String description;
 	
+	/** メンバー数 */
+	private int members;
+	
+	/** ファーストタスク */
+	@ManyToOne
+    @JoinColumn(name = "first_task_id")
+    private Task firstTask;
+	
 	/** 作成日時 */
 	@Column(name = "created_at")
-	private LocalDateTime cteatedAt;
+	private LocalDateTime createdAt;
 	
 	/** 更新日時 */
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
+	
+	
+	public Project(String projectId) {
+		this.projectId = projectId;
+	}
 }

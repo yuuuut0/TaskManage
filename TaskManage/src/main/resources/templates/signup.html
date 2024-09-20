@@ -36,9 +36,9 @@
 									<span class="text-danger" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}"></span>
 								</div>
 								<div class="mb-3">
-									<label for="userName">name</label>
-									<input class="form-control" type="text" th:field="*{userName}" required>
-									<span class="text-danger" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}"></span>
+									<label for="username">name</label>
+									<input class="form-control" type="text" th:field="*{username}" required>
+									<span class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
 								</div>
 								<div class="mb-3">
 									<label for="password">password</label>
@@ -46,7 +46,7 @@
 									<span class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
 								</div>
 								<p class="text-center">
-									<input class="btn btn-primary" type="submit" value="登録">
+									<button class="btn btn-primary" type="submit">登録</button>
 								</p>
 							</div>
 						</form>

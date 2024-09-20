@@ -18,7 +18,7 @@ public class SignupForm {
 	
 	/** ユーザーネーム */
 	@Length(min = 1, max = 20)
-	private String userName;
+	private String username;
 	
 	/** パスワード */
 	@Length(min = 4, max = 20)

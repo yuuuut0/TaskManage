@@ -5,13 +5,12 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * ユーザー情報entity
@@ -19,9 +18,10 @@ import lombok.Data;
  * @author shona
  */
 @Entity
-@Table(name = "user_info")
+@Table(name = "users")
 @Data
-public class User {
+@NoArgsConstructor
+public class UserInfo {
 
 	/** ユーザーID */
 	@Id
@@ -36,7 +36,6 @@ public class User {
 	private String username;
 	
 	/** ハンドルネーム */
-	@NotBlank
 	@Size(max = 4)
 	private String handle;
 	
@@ -48,7 +47,11 @@ public class User {
 	private LocalDateTime lastActiveAt;
 	
 	/** 参画プロジェクトID */
-	@ManyToOne
-	@JoinColumn(name = "project_id")
-	private Project project;
+	@Column(name = "project_id")
+	private String projectId;
+	
+	
+	public UserInfo(String userId) {
+		this.userId = userId;
+	}
 }

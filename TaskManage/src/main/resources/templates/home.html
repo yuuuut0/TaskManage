@@ -1,22 +1,882 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-	<meta charset="UTF-8">
-	<title>home</title>
-</head>
+    <title>MyTask</title>
+  </head>
 
-<body>
-	ホームページ
-	
-	<a th:href="@{/newProject}">プロジェクト作成</a>
-	
-	
-	
-	
-	<form th:action="@{/logout}" method="post">
-		<input type="submit" class="btn btn-light" value="ログアウト">
-	</form>
-</body>
+  <body>
+    <div th:insert="~{common/sourceList :: sourceList}"></div>
+    <div th:replace="~{common/header :: header}"></div>
+    <div th:insert="~{common/sidebar :: sidebar}"></div>
 
+    <!-- 
+	
+	main
+	
+	-->
+    <main class="" id="main">
+      <div class="container-fluid">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="flexSwitchCheckDefault"
+          />
+          <label class="form-check-label" for="flexSwitchCheckDefault"
+            >All / now</label
+          >
+        </div>
+        <div
+          class="alert alert-danger alert-dismissible fade show d-flex align-items-center mt-2"
+          role="alert"
+          th:if="${error != null}"
+        >
+          <div th:text="${error}"></div>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div
+          class="alert alert-dismissible fade show d-flex align-items-center mt-2"
+          role="alert"
+          th:if="${homeAlert != null}"
+          th:classappend="${homeAlert?.isError ? 'alert-danger' : 'alert-info'}"
+        >
+          <i class="bi bi-check-lg me-2"></i>
+          <div th:text="${homeAlert.message}"></div>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <!-- 
+			table
+			 -->
+        <div th:each="parentTask : ${parentTaskList}">
+          <div class="d-flex align-items-center mt-3">
+            <a
+              class="me-2 text-dark"
+              data-bs-toggle="collapse"
+              th:href="|#${parentTask.task.taskId}parentCollapse|"
+              role="button"
+              aria-expanded="false"
+              th:attr="aria-controls='${parentTask.task.taskId}parentCollapse'"
+              style="text-decoration: none"
+            >
+              <span
+                class="text-secondary"
+                th:id="${parentTask.task.taskId}"
+                th:text="|/ ${parentTask.task.title} /.|"
+              ></span>
+            </a>
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-new-task"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#offcanvasNewTask"
+              aria-controls="offcanvasNewTask"
+              th:attr="
+            data-parent-id=${parentTask.task.taskId},
+            data-parent-title=${parentTask.task.title},
+            data-owner-name=${parentTask.task.assignedUser.username}
+						"
+            >
+              <i class="bi bi-plus-lg"></i>
+            </button>
+          </div>
+          <div
+            class="collapse show ms-2 mb-5"
+            th:id="${parentTask.task.taskId} + 'parentCollapse'"
+          >
+            <div th:if="${parentTaskList != null}">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="col-8 table-heading">task</th>
+                    <th scope="col" class="col-width-info"></th>
+                    <th
+                      scope="col"
+                      class="col-width-icon text-center text-nowrap table-heading"
+                    >
+                      優先度
+                    </th>
+                    <th scope="col" class="col col-width-time table-heading">
+                      期日
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <div th:each="task : ${parentTask.subTaskList}">
+                    <tr>
+                      <td
+                        class="progress-background"
+                        data-bs-toggle="collapse"
+                        th:href="|#${task.task.taskId}collapse|"
+                        role="button"
+                        aria-expanded="false"
+                        th:attr="aria-controls='${task.task.taskId}collapse'"
+                      >
+                        <div class="progress">
+                          <div
+                            class="progress-bar"
+                            role="progressbar"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            th:style="'width: ' + ${task.progress} + '%;'"
+                            th:attr="aria-valuenow=${task.progress}"
+														th:classappend="${task.fakeCompleted ? 'bg-warning' : ''}"
+                          ></div>
+                        </div>
+                        <div
+                          class="d-flex justify-content-between align-items-center content"
+                        >
+                          <div
+                            class="scrollable-content"
+                            th:text="${task.task.title}"
+                          ></div>
+                          <i
+                            class="bi bi-chevron-down nav-heading text-secondary lh-2"
+                          ></i>
+
+                          <span
+                            class="nav-heading ps-2 lh-2"
+                            th:text="|${task.progress}%|"
+                          ></span>
+                        </div>
+                      </td>
+                      <td>
+                        <a
+                          type="button"
+                          class="task-info-btn"
+                          data-bs-toggle="offcanvas"
+                          data-bs-target="#offcanvasScrolling"
+                          aria-controls="offcanvasScrolling"
+                          th:attr="
+														data-task-id=${task.task.taskId},
+														data-title=${task.task.title},
+														data-description=${task.task.description},
+														data-assigned-user-id=${task.task.assignedUser.userId},
+														data-assigned-user-name=${task.task.assignedUser.username},
+														data-priority=${task.task.priority},
+														data-deadline=${task.task.deadline},
+														data-sub-completed=${task.task.subCompleted},
+														data-sub-total=${task.task.subTotal},
+														data-completed=${task.completed},
+														data-fake-completed=${task.fakeCompleted},
+														data-parent-title=${parentTask.task.title},
+														data-owner-name=${parentTask.task.assignedUser.username},
+														data-created-at=${task.task.createdAt},
+														data-updated-at=${task.task.updatedAt},
+														data-completed-at=${task.task.completedAt}
+													"
+                        >
+                          <i class="bi bi-info-circle text-body-tertiary"></i>
+                        </a>
+                      </td>
+                      <td class="text-center">
+                        <i
+                          class="priority-icon"
+                          th:attr="data-priority=${task.task.priority}"
+                        ></i>
+                      </td>
+                      <td
+                        th:text="${task.task.deadline != null ? #temporals.format(task.task.deadline, 'M/d HH:mm') : ''}"
+                      ></td>
+                    </tr>
+
+                    <!-- 
+						subtask
+						 -->
+                    <tr
+                      class="collapse"
+                      th:id="${task.task.taskId} + 'collapse'"
+                    >
+                      <td colspan="4" class="ps-4 pb-4">
+                        <button
+                          type="button"
+                          class="btn btn-outline-secondary btn-add"
+                          data-bs-toggle="offcanvas"
+                          data-bs-target="#offcanvasNewTask"
+                          aria-controls="offcanvasNewTask"
+                          th:attr="
+														data-parent-id=${task.task.taskId},
+														data-parent-title=${task.task.title},
+														data-owner-name=${task.task.assignedUser.username}
+													"
+                        >
+                          <i class="bi bi-plus-lg"></i>
+                          add
+                        </button>
+                        <table class="table mb-0" th:unless="${#lists.isEmpty(task.subTaskList)}">
+                          <thead>
+                            <tr>
+                              <th scope="col" class="col-8 table-heading">
+                                task
+                              </th>
+                              <th scope="col" class="col-width-info"></th>
+                              <th
+                                scope="col"
+                                class="text-center text-nowrap table-heading"
+                              >
+                                担当
+                              </th>
+                              <th
+                                scope="col"
+                                class="col-width-icon text-center text-nowrap table-heading"
+                              >
+                                優先度
+                              </th>
+                              <th
+                                scope="col"
+                                class="col col-width-time table-heading"
+                              >
+                                期日
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <div th:each="subTask : ${task.subTaskList}">
+                              <tr>
+                                <td class="progress-background">
+                                  <div class="progress">
+                                    <div
+                                      class="progress-bar"
+                                      role="progressbar"
+                                      aria-valuemin="0"
+                                      aria-valuemax="100"
+                                      th:style="'width: ' + ${subTask.progress} + '%;'"
+                                      th:attr="aria-valuenow=${subTask.progress}"
+																			th:classappend="${task.fakeCompleted ? 'bg-warning' : ''}"
+                                    ></div>
+                                  </div>
+                                  <div
+                                    class="d-flex justify-content-end align-items-center content"
+                                  >
+                                    <span
+                                      class="scrollable-content sub"
+                                      th:text="${subTask.task.title}"
+                                    ></span>
+                                    <span
+                                      class="nav-heading lh-2"
+                                      th:text="|${subTask.progress}%|"
+                                    ></span>
+                                  </div>
+                                </td>
+                                <td>
+                                  <a
+                                    type="button"
+                                    class="task-info-btn"
+                                    data-bs-toggle="offcanvas"
+                                    data-bs-target="#offcanvasScrolling"
+                                    aria-controls="offcanvasScrolling"
+                                    th:attr="
+																			data-task-id=${subTask.task.taskId},
+																			data-title=${subTask.task.title},
+																			data-description=${subTask.task.description},
+																			data-assigned-user-id=${subTask.task.assignedUser.userId},
+																			data-assigned-user-name=${subTask.task.assignedUser.username},
+																			data-priority=${subTask.task.priority},
+																			data-deadline=${subTask.task.deadline},
+																			data-sub-completed=${subTask.task.subCompleted},
+																			data-sub-total=${subTask.task.subTotal},
+																			data-completed=${task.completed},
+																			data-fake-completed=${task.fakeCompleted},
+																			data-parent-title=${task.task.title},
+																			data-owner-name=${task.task.assignedUser.username},
+																			data-created-at=${subTask.task.createdAt},
+																			data-updated-at=${subTask.task.updatedAt},
+																			data-completed-at=${subTask.task.completedAt}
+																		"
+                                  >
+                                    <i
+                                      class="bi bi-info-circle text-body-tertiary"
+                                    ></i>
+                                  </a>
+                                </td>
+                                <td
+                                  class="text-center text-nowrap"
+                                  th:text="${subTask.task.assignedUser.handle}"
+                                ></td>
+                                <td class="text-center">
+                                  <i
+                                    class="priority-icon"
+                                    th:attr="data-priority=${subTask.task.priority}"
+                                  ></i>
+                                </td>
+                                <td th:text="${subTask.task.deadline != null ? #temporals.format(subTask.task.deadline, 'M/d HH:mm') : ''}"></td>
+                              </tr>
+                            </div>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                    <!-- 
+						subtask end
+						 -->
+                  </div>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- 
+			table end
+			 -->
+			 <!-- 
+			 削除確認モーダル
+			 -->
+			 <div
+        class="modal fade"
+        id="deleteTaskModal"
+        aria-hidden="true"
+        tabindex="-1"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5">※注意</h1>
+            </div>
+            <div class="modal-body">
+              タスクを削除すると、関連する下位タスクもすべて削除されます。
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+              
+							<button
+							type="button"
+							class="btn btn-danger hidden-form-trigger"
+							value="delete"
+						>
+							削除
+						</button>
+              
+              <button
+                class="btn btn-secondary"
+                data-bs-target="#modal-project"
+                data-bs-toggle="modal"
+              >
+                close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+			 <!-- 
+			 削除確認モーダルebd
+			 -->
+        <!-- 
+			編集用offcanvas
+			-->
+        <div
+          class="offcanvas offcanvas-end"
+          data-bs-scroll="true"
+          data-bs-backdrop="false"
+          tabindex="-1"
+          id="offcanvasScrolling"
+          aria-labelledby="offcanvasScrollingLabel"
+        >
+          <div class="offcanvas-header">
+            <div
+              class="d-flex justify-content-between align-items-center w-100"
+            >
+              <h5 class="offcanvas-title" id="offcanvasScrollingLabel">
+                タスク詳細
+              </h5>
+              <button
+                type="button"
+                class="btn me-2"
+                id="edit-trigger"
+                data-bs-toggle="button"
+              >
+                <i class="bi bi-pencil-square text-secondary"></i>
+              </button>
+            </div>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="offcanvas-body">
+            <div
+              class="alert alert-info d-flex align-items-center"
+              role="alert"
+              id="completed-alert"
+            >
+              <i class="bi bi-check-circle me-2"></i>
+              <div>達成済みのタスクです</div>
+            </div>
+            <div
+              class="alert alert-warning d-flex align-items-center"
+              role="alert"
+              id="completed-alert-warning"
+            >
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              <div>
+                達成済みですが、<br />未達成のサブタスクが残っています。
+              </div>
+            </div>
+            <form
+              class="row g-3"
+              th:action="@{/task}"
+              method="post"
+              th:object="${editTaskForm}"
+            >
+              <div hidden>
+                <input type="text" id="form-task-id" th:field="*{taskId}" />
+              </div>
+
+              <div class="col-12">
+                <label for="form-title" class="nav-heading">task</label>
+                <input
+                  type="text"
+                  class="form-control-plaintext edit"
+                  id="form-title"
+                  th:field="*{title}"
+                  disabled
+                  required
+                  maxlength="50"
+                />
+              </div>
+              <div class="col-12">
+                <label for="form-description" class="nav-heading"
+                  >description</label
+                >
+                <textarea
+                  class="form-control-plaintext edit"
+                  id="form-description"
+                  th:field="*{description}"
+                  rows="3"
+                  disabled
+                  maxlength="300"
+                ></textarea>
+              </div>
+              <div class="col-12">
+                <label for="form-assigned-user" class="nav-heading">担当</label>
+                <div class="input-group search-form">
+                  <select
+                    class="form-control-plaintext search-select edit"
+                    th:field="*{assignedUserId}"
+                    id="form-assigned-user"
+                    disabled
+                  >
+                    <option
+                      id="form-assigned-user-selected"
+                      value=""
+                      selected
+                    ></option>
+                    <option
+                      th:each="member : ${memberList}"
+                      th:value="${member.userId}"
+                      th:text="${member.handle}"
+                    ></option>
+                  </select>
+                  <input
+                    class="form-control search-input"
+                    type="text"
+                    placeholder="all"
+                    hidden
+                  />
+                  <button
+                    class="btn btn-outline-primary btn-sm search-button"
+                    type="button"
+                    hidden
+                  >
+                    検索
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <span class="nav-heading">優先度</span>
+                <div class="d-flex align-items-center">
+                  <div class="form-check me-4 d-flex align-items-center">
+                    <input
+                      class="form-check-input edit"
+                      type="radio"
+                      th:field="*{priority}"
+                      id="form-priority1"
+                      value="1"
+                      disabled
+                    />
+                    <label class="form-check-label ms-2" for="form-priority1"
+                      >なし</label
+                    >
+                  </div>
+                  <div class="form-check me-4 d-flex align-items-center">
+                    <input
+                      class="form-check-input edit"
+                      type="radio"
+                      th:field="*{priority}"
+                      id="form-priority2"
+                      value="2"
+                      disabled
+                    />
+                    <label class="form-check-label ms-2" for="form-priority2">
+                      <i class="bi bi-hourglass-split text-warning fs-4"></i>
+                    </label>
+                  </div>
+                  <div class="form-check me-4 d-flex align-items-center">
+                    <input
+                      class="form-check-input edit"
+                      type="radio"
+                      th:field="*{priority}"
+                      id="form-priority3"
+                      value="3"
+                      disabled
+                    />
+                    <label class="form-check-label ms-2" for="form-priority3">
+                      <i
+                        class="bi bi-exclamation-circle-fill text-primary fs-4"
+                      ></i>
+                    </label>
+                  </div>
+                  <div class="form-check me-4 d-flex align-items-center">
+                    <input
+                      class="form-check-input edit"
+                      type="radio"
+                      th:field="*{priority}"
+                      id="form-priority4"
+                      value="4"
+                      checked
+                    />
+                    <label class="form-check-label ms-2" for="form-priority4">
+                      <i
+                        class="bi bi-exclamation-triangle-fill text-danger fs-4"
+                      ></i>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <label for="form-deadline" class="nav-heading">締切</label>
+                <input
+                  type="datetime-local"
+                  class="form-control-plaintext edit"
+                  id="form-deadline"
+                  th:field="*{deadline}"
+                  disabled
+                />
+              </div>
+              <div class="col-12">
+                <label class="nav-heading">sub 達成度</label>
+                <div class="d-flex align-items-center">
+                  <input
+                    type="text"
+                    class="form-control-plaintext"
+                    id="form-sub-completed"
+                    disabled
+                  />
+                  <span class="mx-3">/</span>
+                  <input
+                    type="text"
+                    class="form-control-plaintext"
+                    id="form-sub-total"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="nav-heading">parent task</label>
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="form-parent-title"
+                  disabled
+                />
+              </div>
+              <div class="col-12">
+                <label class="nav-heading">責任者</label>
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="form-owner-name"
+                  disabled
+                />
+              </div>
+
+              <div class="col-12">
+                <button
+                  type="button"
+                  class="btn btn-success hidden-form-trigger"
+                  id="completeButton"
+                  value="complete"
+                >
+                  完了
+                </button>
+                <div
+                  class="d-none justify-content-between w-100"
+                  id="formActions"
+                >
+                  <button type="submit" class="btn btn-secondary" name="update">
+                    更新
+                  </button>
+                  <button
+                  type="button"
+                  class="btn btn-danger"
+                  data-bs-target="#deleteTaskModal"
+                  data-bs-toggle="modal"
+									name=""
+                  hidden
+									>
+										削除
+									</button>
+                </div>
+              </div>
+
+              <div class="col-12 nav-heading justify-content-end">
+                <div class="d-flex justify-content-end align-items-center">
+                  <label class="me-2">作成日時</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control-plaintext w-32"
+                    id="form-created-at"
+                    disabled
+                  />
+                </div>
+                <div class="d-flex justify-content-end align-items-center">
+                  <label class="me-2">更新日時</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control-plaintext w-32"
+                    id="form-updated-at"
+                    disabled
+                  />
+                </div>
+                <div
+                  class="d-flex justify-content-end align-items-center d-none"
+                  id="form-completed-at-div"
+                >
+                  <label class="me-2">完了日時</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control-plaintext w-32"
+                    id="form-completed-at"
+                    disabled
+                  />
+                </div>
+              </div>
+            </form>
+            <form th:action="@{/task}" method="post" hidden>
+              <input type="text" id="hidden-form-task-id" name="taskId"/>
+              <button type="submit" id="hidden-form-submit"></button>
+            </form>
+          </div>
+        </div>
+
+        <!-- 
+			新規作成用offcanvas
+			-->
+        <div
+          class="offcanvas offcanvas-end"
+          data-bs-scroll="true"
+          data-bs-backdrop="false"
+          tabindex="-1"
+          id="offcanvasNewTask"
+          aria-labelledby="offcanvasNewTaskLabel"
+        >
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNewTaskLabel">
+              タスク作成
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="offcanvas-body">
+            <form
+              class="row g-3"
+              th:action="@{/task}"
+              method="post"
+              th:object="${createTaskForm}"
+            >
+              <div class="col-12">
+                <label for="new-title" class="nav-heading">title</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="new-title"
+                  th:field="*{title}"
+                  placeholder="タイトル"
+                  required
+                  maxlength="50"
+                />
+              </div>
+              <div class="col-12">
+                <label for="new-description" class="nav-heading"
+                  >description</label
+                >
+                <textarea
+                  class="form-control"
+                  id="new-description"
+                  th:field="*{description}"
+                  rows="3"
+                  placeholder="詳細"
+                  maxlength="300"
+                ></textarea>
+              </div>
+              <div class="col-12">
+                <label for="new-assigned-user" class="nav-heading">担当</label>
+                <div class="input-group search-form">
+                  <select
+                    class="form-select search-select"
+                    th:field="*{assignedUserId}"
+                    id="new-assigned-user"
+                  >
+                    <option
+                      id="new-assigned-user-selected"
+                      th:value="${user.userId}"
+                      th:text="${user.handle}"
+                      selected
+                    ></option>
+                    <option
+                      th:each="member : ${memberList}"
+                      th:value="${member.userId}"
+                      th:text="${member.handle}"
+                    ></option>
+                  </select>
+                  <input
+                    class="form-control search-input"
+                    type="text"
+                    placeholder="all"
+                  />
+                  <button
+                    class="btn btn-outline-primary btn-sm search-button"
+                    type="button"
+                  >
+                    検索
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <span class="nav-heading">優先度</span>
+                <div class="d-flex align-items-center">
+                  <div class="form-check me-4 d-flex align-items-center">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      th:field="*{priority}"
+                      id="new-priority1"
+                      value="1"
+                      checked
+                    />
+                    <label class="form-check-label ms-2" for="new-priority1"
+                      >なし</label
+                    >
+                  </div>
+                  <div class="form-check me-4 d-flex align-items-center">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      th:field="*{priority}"
+                      id="new-priority2"
+                      value="2"
+                    />
+                    <label class="form-check-label ms-2" for="new-priority2">
+                      <i class="bi bi-hourglass-split text-warning fs-4"></i>
+                    </label>
+                  </div>
+                  <div class="form-check me-4 d-flex align-items-center">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      th:field="*{priority}"
+                      id="new-priority3"
+                      value="3"
+                    />
+                    <label class="form-check-label ms-2" for="new-priority3">
+                      <i
+                        class="bi bi-exclamation-circle-fill text-primary fs-4"
+                      ></i>
+                    </label>
+                  </div>
+                  <div class="form-check me-4 d-flex align-items-center">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      th:field="*{priority}"
+                      id="new-priority4"
+                      value="4"
+                    />
+                    <label class="form-check-label ms-2" for="new-priority4">
+                      <i
+                        class="bi bi-exclamation-triangle-fill text-danger fs-4"
+                      ></i>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <label for="new-deadline" class="nav-heading">締切</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="new-deadline"
+                  th:field="*{deadline}"
+                />
+              </div>
+              <div class="col-12">
+                <label for="new-parent-title" class="nav-heading"
+                  >parent task</label
+                >
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="new-parent-title"
+                  disabled
+                />
+                <input
+                  type="text"
+                  th:field="*{parentId}"
+                  id="new-parent-id"
+                  hidden
+                />
+              </div>
+              <div class="col-12">
+                <label class="nav-heading">責任者</label>
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="new-owner-name"
+                  disabled
+                />
+              </div>
+              <input
+                type="text"
+                name="projectId"
+                th:value="${nowProjectInfo.projectId}"
+                hidden
+              />
+              <div class="col-12">
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  id="createTaskBtn"
+                  name="create"
+                >
+                  作成
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script th:src="@{/main.js}"></script>
+  </body>
 </html>
