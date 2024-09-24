@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -8,7 +9,6 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,7 +23,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class UserProject {
 
 	@EmbeddedId
@@ -43,5 +42,12 @@ public class UserProject {
 	@NotBlank
 	@Size(max = 4)
 	private String handle;
+	
+	@Column(name = "unapproved_count")
+	private int UnapprovedCount;
+	
+	@Column(name = "requests_count")
+	private int RequestsCount;
     
+	public UserProject(UserProjectId id, UserInfo user, Project project, String handle) {};
 }

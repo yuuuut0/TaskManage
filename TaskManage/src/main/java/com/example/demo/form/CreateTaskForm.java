@@ -17,6 +17,8 @@ public class CreateTaskForm {
 	
 	private String assignedUserId;
 	
+	private boolean submitFlg;
+	
 	private byte priority;
 	
 	private LocalDateTime deadline;

@@ -2,8 +2,11 @@ package com.example.demo.entity;
 
 import java.time.LocalDateTime;
 
+import com.example.demo.event.TaskEntityListener;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,6 +24,7 @@ import lombok.NoArgsConstructor;
  * @author shona
  */
 @Entity
+@EntityListeners(TaskEntityListener.class)
 @Table(name = "tasks")
 @Data
 @NoArgsConstructor
@@ -58,9 +62,13 @@ public class Task {
 	@Column(name = "sub_total")
 	private int subTotal;
 	
-	/** 状態 */
-	@Column(name = "completed_frg")
-	private boolean completedFrg;
+	/** 提出フラグ */
+	@Column(name = "submit_flg")
+	private boolean submitFlg;
+
+	/** 完了フラグ */
+	@Column(name = "completed_flg")
+	private boolean completedFlg;
 	
 	/** 優先度 */
 	private byte priority;

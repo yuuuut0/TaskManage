@@ -8,7 +8,9 @@
       <div class="container-fluid">
         <div class="d-flex align-items-center">
           <i class="bi bi-filter-left me-2 toggle-sidebar-btn navbar-brand"></i>
-          <a class="navbar-brand" href="#">Project</a>
+          <a class="navbar-brand" th:href="@{/home}">Project</a>
+        </div>
+        <div id="loginUserId" th:text="${#authentication.principal.username}" hidden>
         </div>
         <ul class="navbar-nav">
           <li class="nav-item">
@@ -20,7 +22,14 @@
             <a class="nav-link" href="#">Overview</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Approval</a>
+            <a class="nav-link position-relative" th:href="@{/approval}">
+              Approval
+              <span 
+                class="position-absolute translate-middle badge rounded-pill bg-danger"
+                th:if="${approvalCount > 0}"
+                th:text="${approvalCount}"
+              ></span>
+            </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Free</a>

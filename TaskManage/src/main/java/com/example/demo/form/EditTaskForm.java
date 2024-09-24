@@ -15,6 +15,8 @@ public class EditTaskForm {
 	private String description;
 	
 	private String assignedUserId;
+	
+	private boolean submitFlg;
 
 	private int priority;
 	

@@ -48,6 +48,7 @@ public class ViewController {
 		model.addAttribute("joinedProjectList", dto.getBaseDto().getJoinedProjectList());
 		model.addAttribute("memberList", dto.getBaseDto().getMemberList());
 		model.addAttribute("parentTaskLabel", dto.getBaseDto().getParentTaskLabel());
+		model.addAttribute("approvalCount", dto.getBaseDto().getApprovalCount());
 		model.addAttribute("parentTaskList", dto.getParentTaskList());
 		
 		return "home";
@@ -64,8 +65,24 @@ public class ViewController {
 		model.addAttribute("nowProjectInfo", dto.getNowProjectInfo());
 		model.addAttribute("memberList", dto.getMemberList());
 		model.addAttribute("joinedProjectList", dto.getJoinedProjectList());
+		model.addAttribute("approvalCount", dto.getApprovalCount());
 		
 		return "newProject";
+	}
+	
+	@GetMapping("/approval")
+	public String approval(@AuthenticationPrincipal User user, Model model, EditProjectForm editProjectForm) {
+		
+		var userId = user.getUsername();
+		var dto = viewService.getBaseDto(userId);
+		
+		model.addAttribute("user", dto.getUser());
+		model.addAttribute("nowProjectInfo", dto.getNowProjectInfo());
+		model.addAttribute("memberList", dto.getMemberList());
+		model.addAttribute("joinedProjectList", dto.getJoinedProjectList());
+		model.addAttribute("approvalCount", dto.getApprovalCount());
+		
+		return "approval";
 	}
 
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.form.CreateProjectForm;
+import com.example.demo.form.EditProjectForm;
 import com.example.demo.form.JoinProjectForm;
 import com.example.demo.service.ProjectService;
 
@@ -38,6 +39,7 @@ public class ProjectControler {
 			}
 			
 		}catch(Exception e) {
+			e.printStackTrace();
 			rs.addFlashAttribute("error", e.getMessage());
 			return "redirect:/newProject";
 		}
@@ -60,10 +62,34 @@ public class ProjectControler {
 			}
 			
 		}catch(Exception e) {
+			e.printStackTrace();
 			rs.addFlashAttribute("error", e.getMessage());
 			return "redirect:/newProject";
 		}
 	}
 	
+	@PostMapping(params = "update")
+	public String update(@AuthenticationPrincipal User user, EditProjectForm editProjectForm, RedirectAttributes rs) {
+		var userId = user.getUsername();
+		try {
+			var result = projectService.update(userId, editProjectForm);
+			rs.addFlashAttribute("sidebarAlert", result);
+		}catch(Exception e) {
+			e.printStackTrace();
+			rs.addFlashAttribute("error", e.getMessage());
+		}
+		return "redirect:/home";
+	}
 	
+	@PostMapping(params = "updateCode")
+	public String updateCode(String projectId, String projectCode, RedirectAttributes rs) {
+		try {
+			var result = projectService.updateCode(projectId, projectCode);
+			rs.addFlashAttribute("sidebarAlert", result);
+		}catch(Exception e) {
+			e.printStackTrace();
+			rs.addFlashAttribute("error", e.getMessage());
+		}
+		return "redirect:/home";
+	}
 }

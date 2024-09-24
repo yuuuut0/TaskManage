@@ -10,6 +10,7 @@ import com.example.demo.domain.ProjectInfo;
 import com.example.demo.dto.BaseDto;
 import com.example.demo.dto.MyTaskDto;
 import com.example.demo.entity.Task;
+import com.example.demo.entity.UserProjectId;
 import com.example.demo.repository.ProjectRepository;
 import com.example.demo.repository.TaskRepository;
 import com.example.demo.repository.UserProjectRepository;
@@ -49,7 +50,7 @@ public class ViewService {
 			nowProjectInfo.setLeaderId(firstTask.getAssignedUser().getUserId());
 			nowProjectInfo.setLeaderName(firstTask.getAssignedUser().getUsername());
 			int progress;
-			if(firstTask.isCompletedFrg()) {
+			if(firstTask.isCompletedFlg()) {
 				progress = 100;
 			}else if(firstTask.getSubTotal() == 0) {
 				progress = 0;
@@ -62,9 +63,14 @@ public class ViewService {
 			baseDto.setMemberList(memberList);
 			baseDto.setNowProjectInfo(nowProjectInfo);
 			
+			var userProject = userProjectDao.findById(new UserProjectId(userId,nowProject.getProjectId())).get();
+			var approvalCount = userProject.getUnapprovedCount() + userProject.getRequestsCount();
+			baseDto.setApprovalCount(approvalCount);
+			
+			
 			var parentIdList = taskDao.findParentTaskIdList(userId, nowProject.getProjectId());
 			var parentTaskList = taskDao.findAllById(parentIdList);
-			if(nowProjectInfo.getLeaderId().equals(userId) && parentTaskList.isEmpty()) {
+			if(nowProjectInfo.getLeaderId().equals(userId) && !parentTaskList.contains(firstTask)) {
 				parentTaskList = new ArrayList<Task>(parentTaskList);
 				parentTaskList.addFirst(firstTask);
 			}
@@ -113,26 +119,32 @@ public class ViewService {
 		var nestingTask = new NestingTaskDto(); 
 		nestingTask.setTask(task);
 		int progress;
-		if(task.isCompletedFrg()) {
+		boolean submitFlg = task.isSubmitFlg();
+		boolean compFlg = task.isCompletedFlg();
+		int subComp = task.getSubCompleted();
+		int subTotal = task.getSubTotal();
+		if(compFlg) {
 			progress = 100;
-		}else if(task.getSubTotal() == 0) {
+		}else if(subTotal == 0) {
 			progress = 0;
 		}else {
-			progress = (int)(((double)task.getSubCompleted() / task.getSubTotal())*100);
+			progress = (int)(((double)subComp / subTotal)*100);
 		}
 		nestingTask.setProgress(progress);
 		
-		var completed = false;
-		var fakeCompleted = false;
-		if(task.isCompletedFrg()) {
-			if(task.getSubCompleted() == task.getSubTotal()) {
-				completed = true;
-			}else{
-				fakeCompleted = true;
+		
+		if(compFlg) {
+			if(submitFlg || !(subTotal == subComp)) {
+				nestingTask.setWarning(true);
 			}
 		}
-		nestingTask.setCompleted(completed);
-		nestingTask.setFakeCompleted(fakeCompleted);
+		
+		
+		if(submitFlg && !compFlg) {
+			if(subTotal != 0 && subTotal == subComp) {
+				nestingTask.setNeedNotify(true);
+			}
+		}
 		
 		
 		var subTaskDtoList = new ArrayList<NestingTaskDto>();

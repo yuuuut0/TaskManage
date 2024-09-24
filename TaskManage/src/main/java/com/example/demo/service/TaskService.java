@@ -19,15 +19,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TaskService {
 
+	
 	/** ModelMapper */
 	private final ModelMapper mapper;
 	
 	private final TaskRepository taskDao;
 	
+	
+	@Transactional(rollbackFor = Exception.class)
 	public ResultMsg completeToggle(int taskId) {
 		try {
 			var task = taskDao.findById(taskId).get();
-			if(task.isCompletedFrg()) {
+			var compFlg = task.isCompletedFlg();
+			var submitFlg = task.isSubmitFlg();
+			if(submitFlg) {
+				return ResultMsg.UNKNOWN_ERROR;
+			}else if(compFlg) {
 				if(task.getSubCompleted() == task.getSubTotal() && task.getSubTotal() != 0) {
 					return ResultMsg.UNKNOWN_ERROR;
 				}else {
@@ -43,10 +50,10 @@ public class TaskService {
 		return ResultMsg.EDIT_SUCCEED;
 	}
 	
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	private void complete(Task task) {
 		try {
-			task.setCompletedFrg(true);
+			task.setCompletedFlg(true);
 			task.setUpdatedAt(LocalDateTime.now());
 			task.setCompletedAt(LocalDateTime.now());
 			taskDao.save(task);
@@ -55,7 +62,7 @@ public class TaskService {
 				var parentSubComp = parentTask.getSubCompleted() + 1;
 				parentTask.setSubCompleted(parentSubComp);
 				
-				if(parentSubComp == parentTask.getSubTotal()) {
+				if(parentSubComp == parentTask.getSubTotal() && !parentTask.isSubmitFlg()) {
 					complete(parentTask);
 				}
 				taskDao.save(parentTask);
@@ -66,17 +73,17 @@ public class TaskService {
 		}
 	}
 	
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	private void incomplete(Task task) {
 		try {
-			task.setCompletedFrg(false);
+			task.setCompletedFlg(false);
 			task.setUpdatedAt(LocalDateTime.now());
 			taskDao.save(task);
 			if(task.getParentId() != null) {
 				var parentTask = taskDao.findById(task.getParentId()).get();
 				parentTask.setSubCompleted(parentTask.getSubCompleted() - 1);
 				
-				if(parentTask.isCompletedFrg()) {
+				if(parentTask.isCompletedFlg() && !parentTask.isSubmitFlg()) {
 					incomplete(parentTask);
 				}
 				taskDao.save(parentTask);
@@ -88,7 +95,6 @@ public class TaskService {
 	}
 	
 	
-	@Transactional
 	public ResultMsg create(CreateTaskForm form) {
 		var task = mapper.map(form, Task.class);
 		var user = new UserInfo(form.getAssignedUserId());
@@ -99,7 +105,7 @@ public class TaskService {
 		try {
 			taskDao.save(task);
 			var parentTask = taskDao.findById(task.getParentId()).get();
-			parentTask.setCompletedFrg(false);
+			parentTask.setCompletedFlg(false);
 			parentTask.setSubTotal(parentTask.getSubTotal()+1);
 			parentTask.setUpdatedAt(LocalDateTime.now());
 			taskDao.save(parentTask);
@@ -113,7 +119,7 @@ public class TaskService {
 	@Transactional
 	public ResultMsg delete(int taskId) {
 		var task = taskDao.findById(taskId).get();
-		var compFrg = task.isCompletedFrg();
+		var compFrg = task.isCompletedFlg();
 		
 		var parentTask = taskDao.findById(task.getParentId()).get();
 		var subComp = parentTask.getSubCompleted();
@@ -132,7 +138,7 @@ public class TaskService {
 		try {
 			taskDao.delete(task);
 			taskDao.save(parentTask);
-			if(subComp == subTotal && !parentTask.isCompletedFrg()) {
+			if(subComp == subTotal && !parentTask.isCompletedFlg()) {
 				complete(parentTask);
 			}
 		}catch(Exception e) {
@@ -151,4 +157,6 @@ public class TaskService {
 		taskDao.save(task);
 		return ResultMsg.EDIT_SUCCEED;
 	}
+	
+	
 }

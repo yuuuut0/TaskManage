@@ -7,6 +7,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.form.CreateTaskForm;
 import com.example.demo.form.EditTaskForm;
+import com.example.demo.service.ApprovalService;
 import com.example.demo.service.TaskService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 public class TaskController {
 
 	private final TaskService taskService;
+	
+	private final ApprovalService approvalService;
 	
 	
 	@PostMapping(params = "complete")
@@ -31,6 +34,19 @@ public class TaskController {
 		
 		return "redirect:/home";
 		
+	}
+	
+	@PostMapping(params = "submit")
+	public String submit(int taskId, String ownerId, String comment, RedirectAttributes rs) {
+		try {
+			var result = approvalService.submitToggle(taskId, ownerId, comment);
+			rs.addFlashAttribute("homeAlert", result);
+		}catch(Exception e) {
+			e.printStackTrace();
+			rs.addFlashAttribute("error", e.getMessage());
+		}
+		
+		return "redirect:/home";
 	}
 	
 	@PostMapping(params = "delete")

@@ -16,6 +16,7 @@ import com.example.demo.entity.UserProjectId;
 @Repository
 public interface UserProjectRepository extends JpaRepository<UserProject, UserProjectId>{
 
+	
 	@Query("SELECT u.project FROM UserProject u WHERE u.id.userId = :userId")
     List<Project> findProjectsByUserId(@Param("userId") String userId);
 	

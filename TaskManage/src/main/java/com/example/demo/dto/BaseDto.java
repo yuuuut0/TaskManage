@@ -22,4 +22,6 @@ public class BaseDto {
 	private List<Project> joinedProjectList;
 	
 	private List<Task> parentTaskLabel;
+	
+	private int approvalCount;
 }

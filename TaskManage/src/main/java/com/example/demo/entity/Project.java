@@ -44,9 +44,6 @@ public class Project {
 	@Size(max = 300)
 	private String description;
 	
-	/** メンバー数 */
-	private int members;
-	
 	/** ファーストタスク */
 	@ManyToOne
     @JoinColumn(name = "first_task_id")

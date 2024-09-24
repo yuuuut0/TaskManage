@@ -13,6 +13,11 @@ common
   line-height: 1.5rem!important;
 }
 
+.badge{
+  --bs-badge-padding-x: 0.6em;
+  --bs-badge-font-size: 0.6em;
+}
+
 /* 
 navbar
  */

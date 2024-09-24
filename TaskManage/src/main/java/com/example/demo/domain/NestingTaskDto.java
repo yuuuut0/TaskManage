@@ -13,9 +13,9 @@ public class NestingTaskDto {
 	
 	private int progress;
 	
-	private boolean completed;
+	private boolean isWarning;
 	
-	private boolean fakeCompleted;
+	private boolean needNotify;
 	
 	private List<NestingTaskDto> subTaskList;
 }

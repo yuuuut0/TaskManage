@@ -10,9 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.constant.ResultMsg;
 import com.example.demo.entity.Project;
 import com.example.demo.entity.Task;
+import com.example.demo.entity.UserInfo;
 import com.example.demo.entity.UserProject;
 import com.example.demo.entity.UserProjectId;
 import com.example.demo.form.CreateProjectForm;
+import com.example.demo.form.EditProjectForm;
 import com.example.demo.form.JoinProjectForm;
 import com.example.demo.repository.ProjectRepository;
 import com.example.demo.repository.TaskRepository;
@@ -56,7 +58,6 @@ public class ProjectService {
 		project.setCode(encodedCode);
 		project.setName(form.getProjectName());
 		project.setDescription(form.getProjectDescription());
-		project.setMembers(1);
 		project.setCreatedAt(LocalDateTime.now());
 		project.setUpdatedAt(LocalDateTime.now());
 		
@@ -106,7 +107,6 @@ public class ProjectService {
 		var user = userDao.findById(userId).get();
 		user.setProjectId(projectId);
 		user.setHandle(handle);
-		project.setMembers(project.getMembers() + 1);
 		
 		var userProjectId = new UserProjectId(userId, projectId);
 		var userProject = new UserProject(userProjectId, user, project, handle);
@@ -122,5 +122,37 @@ public class ProjectService {
 		
 		return ResultMsg.EDIT_SUCCEED;
 		
+	}
+	
+	@Transactional
+	public ResultMsg update(String userId, EditProjectForm form) {
+		var project = projectDao.findById(form.getProjectId()).get();
+		if(!project.getFirstTask().getAssignedUser().getUserId().equals(userId)) {
+			return ResultMsg.NOT_AUTHORIZED;
+		}
+		mapper.map(form, project);
+		project.setUpdatedAt(LocalDateTime.now());
+		
+		var task = taskDao.findById(project.getFirstTask().getTaskId()).get();
+		var newLeader = new UserInfo(form.getLeaderId());
+		task.setTitle(form.getTitle());
+		task.setDescription(form.getTaskDescription());
+		task.setAssignedUser(newLeader);
+		task.setDeadline(form.getDeadline());
+		task.setUpdatedAt(LocalDateTime.now());
+		
+		
+		projectDao.save(project);
+		taskDao.save(task);
+		
+		return ResultMsg.EDIT_SUCCEED;
+	}
+	
+	public ResultMsg updateCode(String projectId, String projectCode) {
+		var project = projectDao.findById(projectId).get();
+		var code = passwordEncoder.encode(projectCode);
+		project.setCode(code);
+		projectDao.save(project);
+		return ResultMsg.EDIT_SUCCEED;
 	}
 }
