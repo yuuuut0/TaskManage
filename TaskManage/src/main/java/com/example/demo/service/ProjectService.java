@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.constant.ResultMsg;
@@ -24,6 +25,7 @@ import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 @RequiredArgsConstructor
 public class ProjectService {
 
@@ -41,7 +43,6 @@ public class ProjectService {
 	
 	private final UserProjectRepository userProjectDao;
 	
-	@Transactional
 	public ResultMsg create (String userId, CreateProjectForm form) {
 		
 		var firstTask = new Task();
@@ -61,33 +62,28 @@ public class ProjectService {
 		project.setCreatedAt(LocalDateTime.now());
 		project.setUpdatedAt(LocalDateTime.now());
 		
-		try {
-			var savedTask = taskDao.save(firstTask);
-			
-			if(!projectDao.existsById(project.getProjectId())) {
-				project.setFirstTask(savedTask);
-				projectDao.save(project);
-			}else {
-				return ResultMsg.EXISTED_PROJECT_ID;
-			}
-			
-			var handle = form.getHandle();
-			var userProjectId = new UserProjectId(userId, project.getProjectId());
-			var userProject = new UserProject(userProjectId, assignedUser, project, handle);
-			userProjectDao.save(userProject);
-			
-			assignedUser.setHandle(handle);
-			assignedUser.setProjectId(project.getProjectId());
-			userDao.save(assignedUser);
-			
-		}catch(Exception e) {
-			throw e;
+		
+		var savedTask = taskDao.save(firstTask);
+		
+		if(!projectDao.existsById(project.getProjectId())) {
+			project.setFirstTask(savedTask);
+			projectDao.save(project);
+		}else {
+			return ResultMsg.EXISTED_PROJECT_ID;
 		}
+		
+		var handle = form.getHandle();
+		var userProjectId = new UserProjectId(userId, project.getProjectId());
+		var userProject = new UserProject(userProjectId, assignedUser, project, handle);
+		userProjectDao.save(userProject);
+		
+		assignedUser.setHandle(handle);
+		assignedUser.setProjectId(project.getProjectId());
+		userDao.save(assignedUser);
 		
 		return ResultMsg.EDIT_SUCCEED;
 	}
 	
-	@Transactional
 	public ResultMsg join(String userId, JoinProjectForm form) {
 		var projectId = form.getProjectId();
 		var projectCode = form.getProjectCode();
@@ -111,20 +107,14 @@ public class ProjectService {
 		var userProjectId = new UserProjectId(userId, projectId);
 		var userProject = new UserProject(userProjectId, user, project, handle);
 		
-		try {
-			userProjectDao.save(userProject);
-			userDao.save(user);
-			projectDao.save(project);
-			
-		}catch(Exception e) {
-			throw e;
-		}
+		userProjectDao.save(userProject);
+		userDao.save(user);
+		projectDao.save(project);
 		
 		return ResultMsg.EDIT_SUCCEED;
 		
 	}
 	
-	@Transactional
 	public ResultMsg update(String userId, EditProjectForm form) {
 		var project = projectDao.findById(form.getProjectId()).get();
 		if(!project.getFirstTask().getAssignedUser().getUserId().equals(userId)) {
@@ -153,6 +143,21 @@ public class ProjectService {
 		var code = passwordEncoder.encode(projectCode);
 		project.setCode(code);
 		projectDao.save(project);
+		return ResultMsg.EDIT_SUCCEED;
+	}
+	
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	public ResultMsg delete(String userId, String projectId) {
+		var project = projectDao.findById(projectId).get();
+		var firstTask = project.getFirstTask();
+		if(userId.equals(firstTask.getAssignedUser().getUserId())) {
+			projectDao.delete(project);
+			if(firstTask.getParentId() != null) {
+				taskDao.delete(firstTask);
+			}
+		}else {
+			return ResultMsg.UNKNOWN_ERROR;
+		}
 		return ResultMsg.EDIT_SUCCEED;
 	}
 }

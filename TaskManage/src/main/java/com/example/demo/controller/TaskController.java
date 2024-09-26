@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +28,7 @@ public class TaskController {
 	public String complete(int taskId, RedirectAttributes rs) {
 		try {
 			var result = taskService.completeToggle(taskId);
-			rs.addFlashAttribute("homeAlert", result);
+			rs.addFlashAttribute("alert", result);
 		}catch(Exception e) {
 			e.printStackTrace();
 			rs.addFlashAttribute("error", e.getMessage());
@@ -40,7 +42,7 @@ public class TaskController {
 	public String submit(int taskId, String ownerId, String comment, RedirectAttributes rs) {
 		try {
 			var result = approvalService.submitToggle(taskId, ownerId, comment);
-			rs.addFlashAttribute("homeAlert", result);
+			rs.addFlashAttribute("alert", result);
 		}catch(Exception e) {
 			e.printStackTrace();
 			rs.addFlashAttribute("error", e.getMessage());
@@ -53,7 +55,7 @@ public class TaskController {
 	public String delete(int taskId, RedirectAttributes rs) {
 		try {
 			var result = taskService.delete(taskId);
-			rs.addFlashAttribute("homeAlert", result);
+			rs.addFlashAttribute("alert", result);
 		}catch(Exception e) {
 			e.printStackTrace();
 			rs.addFlashAttribute("error", e.getMessage());
@@ -66,7 +68,7 @@ public class TaskController {
 	public String create(CreateTaskForm createTaskForm, RedirectAttributes rs) {
 		try {
 			var result = taskService.create(createTaskForm);
-			rs.addFlashAttribute("homeAlert", result);
+			rs.addFlashAttribute("alert", result);
 		}catch(Exception e) {
 			e.printStackTrace();
 			rs.addFlashAttribute("error", e.getMessage());
@@ -76,15 +78,30 @@ public class TaskController {
 	}
 	
 	@PostMapping(params = "update")
-	public String edit(EditTaskForm editTaskForm ,RedirectAttributes rs) {
+	public String edit(@AuthenticationPrincipal User user, String ownerId, EditTaskForm editTaskForm ,RedirectAttributes rs) {
+		var userId = user.getUsername();
 		try {
-			var result = taskService.update(editTaskForm);
-			rs.addFlashAttribute("homeAlert", result);
+			var result = taskService.update(userId, ownerId, editTaskForm);
+			rs.addFlashAttribute("alert", result);
 		}catch(Exception e) {
 			e.printStackTrace();
 			rs.addFlashAttribute("error", e.getMessage());
 		}
 		
 		return "redirect:/home";
+	}
+	
+	@PostMapping(params = "get")
+	public String get(@AuthenticationPrincipal User user, int taskId, RedirectAttributes rs) {
+		var userId = user.getUsername();
+		try {
+			var result = taskService.getTask(userId, taskId);
+			rs.addFlashAttribute("alert", result);
+		}catch(Exception e) {
+			e.printStackTrace();
+			rs.addFlashAttribute("error", e.getMessage());
+		}
+		
+		return "redirect:/free";
 	}
 }

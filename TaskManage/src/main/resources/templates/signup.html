@@ -8,21 +8,13 @@
 
 <body>
 	<div th:insert="~{common/sourceList :: sourceList}"></div>
-	<div th:replace="~{common/messageIcon :: messageIcon}"></div>
 	<div class="container-lg min-vh-100">
 		<div class="row justify-content-center align-items-center min-vh-100">
 			<div class="col">
 				<h2 class="text-center">新規登録</h2>
 				<div class="row justify-content-center">
 					<div class="col-6 col-md-5">
-						<div class="alert d-flex align-items-center" th:classappend="|${isError?'alert-danger':'alert-primary'}|"
-							th:if="${message != null}" role="alert"> <!-- alert-primary alert-danger -->
-							<svg class="bi flex-shrink-0 me-2" width="24" height="24">
-								<use xlink:href="#exclamation-triangle-fill" th:if="${isError}" />
-								<use xlink:href="#info-fill" th:unless="${isError}" />
-							</svg>
-							<span th:text="${message}"></span>
-						</div>
+						<div th:replace="~{common/alert :: alert}"></div>
 					</div>
 				</div>
 				<div class="row justify-content-center">
@@ -31,12 +23,12 @@
 							<div class="form-group">
 								<div class="mb-3">
 									<label for="userId">userID</label>
-									<input class="form-control" pattern="^[a-zA-Z0-9]+$" type="text" th:field="*{userId}" required>
+									<input class="form-control" pattern="^[a-zA-z0-9._-]+$" type="text" th:field="*{userId}" required>
 									<div class="form-text">半角英数字</div>
 									<span class="text-danger" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}"></span>
 								</div>
 								<div class="mb-3">
-									<label for="username">name</label>
+									<label for="username">username</label>
 									<input class="form-control" type="text" th:field="*{username}" required>
 									<span class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
 								</div>

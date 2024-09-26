@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>free</title>
+  </head>
+
+  <body>
+    <div th:insert="~{common/sourceList :: sourceList}"></div>
+    <div th:replace="~{common/header :: header}"></div>
+    <div th:insert="~{common/sidebar :: sidebar}"></div>
+    <div th:replace="~{common/taskOffcanvas :: taskOffcanvas}"></div>
+
+    <!-- 
+	
+	main
+	
+	-->
+    <main class="" id="main">
+      <div class="container-fluid">
+        <div th:replace="~{common/alert :: alert}"></div>
+
+        <!-- 
+			  table
+			 -->
+       <h5
+        class="text-body-tertiary text-center mt-3"
+        th:if="${freeTaskList.isEmpty}"
+        >
+          現在、freeタスクはありません
+        </h5>
+        <div th:if="${!freeTaskList.isEmpty}">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col" class="col-6 table-heading">task</th>
+                <th scope="col" class="col-width-info"></th>
+                <th
+                  scope="col"
+                  class="text-center text-nowrap table-heading"
+                >
+                  責任者
+                </th>
+                <th
+                  scope="col"
+                  class="col-width-icon text-center text-nowrap table-heading"
+                >
+                  優先度
+                </th>
+                <th
+                  scope="col"
+                  class="col-width-icon text-center text-nowrap table-heading"
+                >
+                  提出
+                </th>
+                <th scope="col" class="col-width-time table-heading">
+                  期日
+                </th>
+                <th scope="col" class="col-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <div th:each="task : ${freeTaskList}">
+                <tr>
+                  <td class="progress-background">
+                    <div class="progress">
+                      <div
+                        class="progress-bar"
+                        role="progressbar"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        th:style="'width: ' + ${task.progress} + '%;'"
+                        th:attr="aria-valuenow=${task.progress}"
+                        th:classappend="${task.isWarning ? 'bg-warning' : ''}"
+                      ></div>
+                    </div>
+                    <div
+                      class="d-flex justify-content-end align-items-center content"
+                    >
+                      <div
+                        class="scrollable-content"
+                        th:text="${task.task.title}"
+                      ></div>
+                      <span
+                        class="nav-heading ps-2 lh-2"
+                        th:text="|${task.progress}%|"
+                      ></span>
+                    </div>
+                  </td>
+                  <td>
+                    <a
+                      type="button"
+                      class="task-info-btn"
+                      data-bs-toggle="offcanvas"
+                      data-bs-target="#offcanvasScrolling"
+                      aria-controls="offcanvasScrolling"
+                      th:attr="
+														data-task-id=${task.task.taskId},
+														data-title=${task.task.title},
+														data-description=${task.task.description},
+                            data-assigned-user-id=${task.task.assignedUser != null ? task.task.assignedUser.userId : ''},
+                            data-assigned-user-name=${task.task.assignedUser != null ? task.task.assignedUser.username : 'free'},
+														data-priority=${task.task.priority},
+														data-deadline=${task.task.deadline},
+														data-sub-completed=${task.task.subCompleted},
+														data-sub-total=${task.task.subTotal},
+														data-submit-flg=${task.task.submitFlg},
+														data-completed-flg=${task.task.completedFlg},
+														data-parent-title=${task.parentTask != null ? task.parentTask.title : 'no parent task'},
+                            data-owner-id=${task.parentTask?.assignedUser != null ? task.parentTask.assignedUser.userId : ''},
+                            data-owner-name=${task.parentTask?.assignedUser != null ? task.parentTask.assignedUser.username : 'free'},
+														data-created-at=${task.task.createdAt},
+														data-updated-at=${task.task.updatedAt},
+														data-completed-at=${task.task.completedAt}
+													"
+                    >
+                      <i
+                        class="bi bi-info-circle text-body-tertiary position-relative"
+                      >
+                        <span
+                          class="position-absolute translate-middle icon-badge p-1 bg-danger border border-light rounded-circle"
+                          th:if="${task.needNotify}"
+                        ></span>
+                      </i>
+                    </a>
+                  </td>
+                  <td
+                    class="text-center text-nowrap"
+                    th:text="${task.parentTask.assignedUser != null ? memberMap.get(task.parentTask.assignedUser.userId) : 'free'}"
+                  ></td>
+                  <td class="text-center">
+                    <i
+                      class="priority-icon"
+                      th:attr="data-priority=${task.task.priority}"
+                    ></i>
+                  </td>
+                  <td class="text-center">
+                    <i
+                      class="bi bi-flag-fill text-body-tertiary fs-6"
+                      th:if="${task.task.submitFlg}"
+                    ></i>
+                  </td>
+                  <td
+                    th:text="${task.task.deadline != null ? #temporals.format(task.task.deadline, 'M/d HH:mm') : ''}"
+                  ></td>
+                  <td class="d-flex justify-content-center">
+                    <form th:action="@{/task}" method="post">
+                      <input type="text" name="taskId" th:value="${task.task.taskId}" hidden>
+                      <button class="btn btn-outline-secondary btn-sm" name="get">受け持つ</button>
+                    </form>
+                  </td>
+                </tr>
+              </div>
+            </tbody>
+          </table>
+        </div>
+        <!-- 
+			  table end
+			 -->
+      </div>
+    </main>
+
+    <script th:src="@{/main.js}"></script>
+  </body>
+</html>

@@ -39,14 +39,14 @@ public class ViewController {
 		
 		var userId = user.getUsername();
 		var dto = viewService.getMyTaskDto(userId);
-		if(dto == null) {
+		if(dto.getBaseDto().getNowProjectInfo() == null) {
 			return "redirect:/newProject";
 		}
 		
 		model.addAttribute("user", dto.getBaseDto().getUser());
 		model.addAttribute("nowProjectInfo", dto.getBaseDto().getNowProjectInfo());
 		model.addAttribute("joinedProjectList", dto.getBaseDto().getJoinedProjectList());
-		model.addAttribute("memberList", dto.getBaseDto().getMemberList());
+		model.addAttribute("memberMap", dto.getBaseDto().getMemberMap());
 		model.addAttribute("parentTaskLabel", dto.getBaseDto().getParentTaskLabel());
 		model.addAttribute("approvalCount", dto.getBaseDto().getApprovalCount());
 		model.addAttribute("parentTaskList", dto.getParentTaskList());
@@ -63,7 +63,7 @@ public class ViewController {
 		
 		model.addAttribute("user", dto.getUser());
 		model.addAttribute("nowProjectInfo", dto.getNowProjectInfo());
-		model.addAttribute("memberList", dto.getMemberList());
+		model.addAttribute("memberMap", dto.getMemberMap());
 		model.addAttribute("joinedProjectList", dto.getJoinedProjectList());
 		model.addAttribute("approvalCount", dto.getApprovalCount());
 		
@@ -71,18 +71,57 @@ public class ViewController {
 	}
 	
 	@GetMapping("/approval")
-	public String approval(@AuthenticationPrincipal User user, Model model, EditProjectForm editProjectForm) {
+	public String approval(@AuthenticationPrincipal User user, Model model, boolean log, EditProjectForm editProjectForm, EditTaskForm editTaskForm) {
 		
+		var userId = user.getUsername();
+		var dto = viewService.getApprovalDto(userId, log);
+		if(dto.getBaseDto().getNowProjectInfo() == null) {
+			return "redirect:/newProject";
+		}
+		
+		model.addAttribute("user", dto.getBaseDto().getUser());
+		model.addAttribute("nowProjectInfo", dto.getBaseDto().getNowProjectInfo());
+		model.addAttribute("memberMap", dto.getBaseDto().getMemberMap());
+		model.addAttribute("joinedProjectList", dto.getBaseDto().getJoinedProjectList());
+		model.addAttribute("approvalCount", dto.getBaseDto().getApprovalCount());
+		model.addAttribute("unapprovedList", dto.getUnapprovedList());
+		model.addAttribute("requestsList", dto.getRequestsList());
+		model.addAttribute("log", log);
+		
+		return "approval";
+	}
+	
+	@GetMapping("/free")
+	public String free(@AuthenticationPrincipal User user, Model model, EditProjectForm editProjectForm, EditTaskForm editTaskForm) {
+		
+		var userId = user.getUsername();
+		var dto = viewService.getFreeDto(userId);
+		if(dto.getBaseDto().getNowProjectInfo() == null) {
+			return "redirect:/newProject";
+		}
+		
+		model.addAttribute("user", dto.getBaseDto().getUser());
+		model.addAttribute("nowProjectInfo", dto.getBaseDto().getNowProjectInfo());
+		model.addAttribute("memberMap", dto.getBaseDto().getMemberMap());
+		model.addAttribute("joinedProjectList", dto.getBaseDto().getJoinedProjectList());
+		model.addAttribute("approvalCount", dto.getBaseDto().getApprovalCount());
+		model.addAttribute("freeTaskList", dto.getFreeTaskList());
+		
+		return "free";
+	}
+	
+	@GetMapping("/setting")
+	public String setting(@AuthenticationPrincipal User user, Model model, EditProjectForm editProjectForm) {
 		var userId = user.getUsername();
 		var dto = viewService.getBaseDto(userId);
 		
 		model.addAttribute("user", dto.getUser());
 		model.addAttribute("nowProjectInfo", dto.getNowProjectInfo());
-		model.addAttribute("memberList", dto.getMemberList());
+		model.addAttribute("memberMap", dto.getMemberMap());
 		model.addAttribute("joinedProjectList", dto.getJoinedProjectList());
 		model.addAttribute("approvalCount", dto.getApprovalCount());
 		
-		return "approval";
+		return "setting";
 	}
 
 }

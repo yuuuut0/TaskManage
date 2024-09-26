@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.WebAttributes;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,20 +11,18 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.example.demo.constant.ResultMsg;
 import com.example.demo.form.LoginForm;
 import com.example.demo.form.SignupForm;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
 public class LoginController {
 
-	/** セッション */
-	private final HttpSession session;
 	
 	/** ユーザー情報repository */
 	private final UserRepository userDao;
@@ -41,8 +38,7 @@ public class LoginController {
 	 */
 	@GetMapping(value = "/login", params = "error")
 	public String viewWithError(Model model, LoginForm form) {
-		var errorInfo =(Exception)session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION) ;
-		model.addAttribute("errorMsg", errorInfo.getMessage());
+		model.addAttribute("alert", ResultMsg.LOGIN_ERROR);
 		return "login";
 	}
 	
@@ -65,14 +61,12 @@ public class LoginController {
 	@PostMapping("/signup")
 	public String signup(Model model, @Validated SignupForm signupForm, BindingResult bdResult) {
 		if(bdResult.hasErrors()) {
-			model.addAttribute("message", "入力項目にエラーがあります");
-			model.addAttribute("isError", true);
+			model.addAttribute("alert", ResultMsg.SIGNUP_FORM_ERROR);
 			return "signup";
 		}
 		
-		var signupResult = userService.registUserInfo(signupForm);
-		model.addAttribute("message", signupResult.getMessage());
-		model.addAttribute("isError", signupResult.isError());
+		var result = userService.registUserInfo(signupForm);
+		model.addAttribute("alert", result);
 		
 		return "signup";
 	}

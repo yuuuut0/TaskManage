@@ -7,9 +7,13 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ResultMsg {
 
+	//ログイン関連
+	LOGIN_ERROR("IDかパスワードが間違っています", true),
+	
 	//ユーザー関連
 	SIGNUP_SUCCEED("登録が完了しました", false),
 	EXISTED_USER_ID("このuserIDは使用されています", true),
+	SIGNUP_FORM_ERROR("入力項目にエラーがあります", true),
 	
 	//プロジェクト関連authorized
 	NOT_AUTHORIZED("編集する権限がありません", true),

@@ -167,9 +167,9 @@
                           selected
                         ></option>
                         <option
-                          th:each="member : ${memberList}"
-                          th:value="${member.userId}"
-                          th:text="${member.handle}"
+                          th:each="member : ${memberMap}"
+                          th:value="${member.key}"
+                          th:text="${member.value}"
                         ></option>
                       </select>
                       <input

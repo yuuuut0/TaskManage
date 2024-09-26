@@ -18,6 +18,11 @@ common
   --bs-badge-font-size: 0.6em;
 }
 
+.icon-badge{
+  top: 5px;
+  left: 15px;
+}
+
 /* 
 navbar
  */
@@ -28,6 +33,11 @@ navbar
   font-size: 11px;
   color: #899bbd;
   /* margin: 10px 0 5px 15px; */
+}
+
+.user-dropdown{
+  top: 45px!important;
+  left: -70px!important;
 }
 
 

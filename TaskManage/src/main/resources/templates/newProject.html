@@ -21,37 +21,7 @@
         <div class="fs-3 my-4 text-secondary text-center">
           新規プロジェクト画面
         </div>
-        <div
-          class="alert alert-danger alert-dismissible fade show d-flex align-items-center mt-2"
-          role="alert"
-          th:if="${error != null}"
-        >
-          <div th:text="${error}"></div>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div
-          class="alert alert-dismissible fade show d-flex align-items-center mt-2"
-          role="alert"
-          th:if="${newProjectAlert != null}"
-          th:classappend="|${newProjectAlert.isError ? 'alert-danger':'alert-info'}|"
-        >
-          <i
-            class="bi me-2"
-            th:classappend="|${newProjectAlert.isError ? 'bi-x-circle':'bi-check-lg'}|"
-          ></i>
-          <div th:text="${newProjectAlert.message}"></div>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert"
-            aria-label="Close"
-          ></button>
-        </div>
+        <div th:replace="~{common/alert :: alert}"></div>
         <div class="d-flex justify-content-center">
           <div
             class="btn-group mb-3 text-center"
@@ -99,7 +69,7 @@
                   required
                   pattern="[A-Za-z0-9.-_]+"
                   maxlength="50"
-                  th:classappend="${newProjectAlert?.name() == 'EXISTED_PROJECT_ID' ? 'is-invalid' : ''}"
+                  th:classappend="${alert?.name() == 'EXISTED_PROJECT_ID' ? 'is-invalid' : ''}"
                 />
               </div>
             </div>
@@ -252,9 +222,9 @@
                   id="join-project-id"
                   th:field="*{projectId}"
                   required
-                  th:classappend="${newProjectAlert?.name() == 'NOT_EXISTED_PROJECT_ID' ? 'is-invalid' : (
-                    newProjectAlert?.name() == 'JOIN_FAILED' ? 'is-invalid' : (
-                      newProjectAlert?.name() == 'EXISTED_HANDLE' ? 'is-valid' : ''
+                  th:classappend="${alert?.name() == 'NOT_EXISTED_PROJECT_ID' ? 'is-invalid' : (
+                    alert?.name() == 'JOIN_FAILED' ? 'is-invalid' : (
+                      alert?.name() == 'EXISTED_HANDLE' ? 'is-valid' : ''
                     )
                   )}"
                 />
@@ -272,7 +242,7 @@
                     id="join-project-code"
                     th:field="*{projectCode}"
                     required
-                    th:classappend="${newProjectAlert?.name() == 'JOIN_FAILED' ? 'is-invalid' : (newProjectAlert?.name() == 'EXISTED_HANDLE' ? 'is-valid' : '')}"
+                    th:classappend="${alert?.name() == 'JOIN_FAILED' ? 'is-invalid' : (alert?.name() == 'EXISTED_HANDLE' ? 'is-valid' : '')}"
                   />
                   <button
                     type="button"
@@ -298,7 +268,7 @@
                   placeholder="最大４文字"
                   required
                   maxlength="4"
-                  th:classappend="${newProjectAlert?.name() == 'EXISTED_HANDLE' ? 'is-invalid' : ''}"
+                  th:classappend="${alert?.name() == 'EXISTED_HANDLE' ? 'is-invalid' : ''}"
                 />
                 <div class="form-text">
                   プロジェクト内で一意に定まる自身のハンドルネームを設定します。

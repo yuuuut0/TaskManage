@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.entity.Approval;
 import com.example.demo.entity.UserProjectId;
 import com.example.demo.repository.ApprovalRepository;
+import com.example.demo.repository.TaskRepository;
 import com.example.demo.repository.UserProjectRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,9 +21,11 @@ public class TaskRemoval {
 	private final ApprovalRepository approvalDao;
 
     private final UserProjectRepository userProjectDao;
+    
+    private final TaskRepository taskDao;
 	
     @EventListener
-	@Transactional
+    @Transactional(rollbackFor = Exception.class)
 	public void handleTaskRemoval(TaskRemovedEvent event) {
     	var task = event.getTask();
 		List<Approval> all = approvalDao.findAllByTask(task);
@@ -40,12 +43,17 @@ public class TaskRemoval {
         
         if(requestOpt.isPresent()) {
         	var request = requestOpt.get();
-        	var assigneeId = request.getTask().getAssignedUser().getUserId();
+        	var assigneeId = request.getAssignee().getUserId();
         	var assignee = userProjectDao.findById(new UserProjectId(assigneeId, projectId)).get();
         	assignee.setRequestsCount(assignee.getRequestsCount() - 1);
         	userProjectDao.save(assignee);
         }
         
         approvalDao.deleteAll(all);
+        
+        var subTasks = taskDao.findAllByParentId(task.getTaskId());
+        if(!subTasks.isEmpty()) {
+        	taskDao.deleteAll(subTasks);
+        }
 	}
 }

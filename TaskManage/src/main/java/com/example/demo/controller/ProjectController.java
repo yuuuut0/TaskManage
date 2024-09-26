@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/project")
-public class ProjectControler {
+public class ProjectController {
 
 	private final ProjectService projectService;
 	
@@ -31,7 +31,7 @@ public class ProjectControler {
 			
 			if(result.isError()) {
 				rs.addFlashAttribute("createProjectForm", createProjectForm);
-				rs.addFlashAttribute("newProjectAlert", result);
+				rs.addFlashAttribute("alert", result);
 				return "redirect:/newProject";
 			}else {
 				rs.addFlashAttribute("sidebarAlert", result);
@@ -54,7 +54,7 @@ public class ProjectControler {
 			
 			if(result.isError()) {
 				rs.addFlashAttribute("joinProjectForm", joinProjectForm);
-				rs.addFlashAttribute("newProjectAlert", result);
+				rs.addFlashAttribute("alert", result);
 				return "redirect:/newProject";
 			}else {
 				rs.addFlashAttribute("sidebarAlert", result);
@@ -86,6 +86,23 @@ public class ProjectControler {
 		try {
 			var result = projectService.updateCode(projectId, projectCode);
 			rs.addFlashAttribute("sidebarAlert", result);
+		}catch(Exception e) {
+			e.printStackTrace();
+			rs.addFlashAttribute("error", e.getMessage());
+		}
+		return "redirect:/home";
+	}
+	
+	@PostMapping(params = "delete")
+	public String delete(@AuthenticationPrincipal User user, String delete, RedirectAttributes rs) {
+		var userId = user.getUsername();
+		try {
+			var result = projectService.delete(userId, delete);
+			if(result.isError()) {
+				rs.addFlashAttribute("sidebarAlert", result);
+			}else {
+				return "redirect:/newProject";
+			}
 		}catch(Exception e) {
 			e.printStackTrace();
 			rs.addFlashAttribute("error", e.getMessage());

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.demo.entity.Approval;
 import com.example.demo.entity.Task;
+import com.example.demo.entity.UserInfo;
 
 public interface ApprovalRepository extends JpaRepository<Approval, Integer>{
 	
@@ -16,4 +17,8 @@ public interface ApprovalRepository extends JpaRepository<Approval, Integer>{
 	
 	public Optional<Approval> findByTaskAndAssigneeFlg(Task task, boolean assigneeFlg);
 	
+    List<Approval> findAllByApproverAndApproverFlgAndProjectId(UserInfo approver, boolean ApproverFlg, String projectId);
+	
+    List<Approval> findAllByAssigneeAndAssigneeFlgAndProjectId(UserInfo assignee, boolean assigeneeFlg, String projectId);
+    
 }

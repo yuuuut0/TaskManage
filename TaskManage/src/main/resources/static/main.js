@@ -307,7 +307,7 @@
 
         // 検索ボタンや他の hidden 要素を表示/非表示
         offcanvasElement
-          .querySelectorAll("input[hidden][name], button[hidden][name]")
+          .querySelectorAll("input[hidden][name]:not([id='form-owner-id']), button[hidden][name]")
           .forEach(function (element) {
             if (isEditing) {
               element.setAttribute("hidden", "hidden"); // 非表示に戻す
@@ -355,11 +355,10 @@
   if (offcanvasElement) {
     offcanvasElement.addEventListener("hidden.bs.offcanvas", function () {
       // #edit-trigger のクリックイベントをプログラム的に発火
-      const editTrigger = document.querySelector("#edit-trigger");
 
-      if (editTrigger.classList.contains("editing")) {
+      if ($editTrigger.classList.contains("editing")) {
         // #edit-trigger をクリックして編集状態を解除
-        editTrigger.click();
+        $editTrigger.click();
       }
     });
 
@@ -455,7 +454,7 @@
       taskEditForm.querySelector("#form-title").value = title;
       taskEditForm.querySelector("#form-description").value = description;
       taskEditForm.querySelector("#form-assigned-user-selected").value =
-        assignedUserId;
+        assignedUserId ? assignedUserId : '';
       taskEditForm.querySelector("#form-assigned-user-selected").textContent =
         assignedUserName;
       taskEditForm.querySelector("#form-submit-flg").checked = submitFlg;
@@ -495,7 +494,7 @@
         }else if(subTotal != 0 && subCompleted == subTotal){
           alertBox.classList.add('alert-warning');
           alertIcon.className = 'bi bi-exclamation-triangle me-2';
-          alertMessage.textContent = 'サブタスクがすべて達成済みです。<br />承認申請を出しましょう！';
+          alertMessage.innerHTML = 'サブタスクがすべて達成済みです。<br />承認申請を出しましょう！';
         }else{
           alertBox.classList.add('alert-info');
           alertIcon.className = 'bi bi-exclamation-triangle me-2';
@@ -557,6 +556,16 @@
           completeButton.innerText = '完了';
           completeButton.value = 'complete';
         }
+      }else{
+        completeButton.className = 'd-none';
+        completeButton.innerText = '';
+      }
+
+      //担当者か責任者以外の場合編集トリガーをなくす
+      if(loginUserId == ownerId || loginUserId == assignedUserId){
+        $editTrigger.className = "btn me-2"
+      }else{
+        $editTrigger.className = "d-none"
       }
 
       // 担当者の項目を初期化
@@ -744,4 +753,82 @@
       document.getElementById("create-project-form").style.display = "none"; // 新規フォームを表示
     });
   }
+
+  if(document.getElementById("unapproved")){
+    // 初期状態では「参加フォーム」が表示され、「新規フォーム」は非表示にする
+    document.getElementById("requests").style.display = "none";
+    document.getElementById("unapproved").style.display = "block";
+
+    // 「参加」ボタンがクリックされた時
+    document.getElementById("btnradio1").addEventListener("click", function () {
+      document.getElementById("requests").style.display = "none"; // 参加フォームを表示
+      document.getElementById("unapproved").style.display = "block"; // 新規フォームを非表示
+    });
+
+    // 「新規」ボタンがクリックされた時
+    document.getElementById("btnradio2").addEventListener("click", function () {
+      document.getElementById("requests").style.display = "block"; // 参加フォームを非表示
+      document.getElementById("unapproved").style.display = "none"; // 新規フォームを表示
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const checkBox = document.getElementById("approvalToggle");
+    if(checkBox){
+      checkBox.addEventListener("change", function() {
+          toggleHistory(this);
+      });
+    }
+  });
+  function toggleHistory(checkbox) {
+    if (checkbox.checked) {
+        window.location.href = '/approval?log=true';
+    } else {
+        window.location.href = '/approval?log=false';
+    }
+  }
+
+  const userToggleButtons = document.querySelectorAll(".user-toggle");
+  if(userToggleButtons.length != 0){
+    userToggleButtons.forEach(button => {
+        button.addEventListener("click", function () {
+          const inputId = button.getAttribute("data-input-id");
+          const input = document.querySelector(`input[data-input-id='${inputId}']`);
+          const btn = document.querySelector(`[data-btn-id='${inputId}']`);
+
+          // 自分がすでに編集モードかどうかを確認
+          const isEditable = !input.disabled;
+
+          if (isEditable) {
+              // すでに編集モードなら解除する
+              input.classList.remove("form-control");
+              input.classList.add("form-control-plaintext");
+              input.disabled = true;
+              btn.hidden = true;
+          } else {
+              // 他の編集状態を解除
+              userToggleButtons.forEach(otherButton => {
+                  if (otherButton !== button) {
+                      const otherInputId = otherButton.getAttribute("data-input-id");
+                      const otherInput = document.querySelector(`input[data-input-id='${otherInputId}']`);
+                      const otherBtn = document.querySelector(`[data-btn-id='${otherInputId}']`);
+
+                      otherInput.classList.remove("form-control");
+                      otherInput.classList.add("form-control-plaintext");
+                      otherInput.disabled = true;
+                      otherBtn.hidden = true;
+                  }
+              });
+
+              // 自分を編集可能にする
+              input.classList.remove("form-control-plaintext");
+              input.classList.add("form-control");
+              input.disabled = false;
+              btn.hidden = false;
+          }
+        });
+    });
+  }
+
+
 })();

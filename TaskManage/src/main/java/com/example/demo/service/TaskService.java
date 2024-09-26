@@ -12,10 +12,12 @@ import com.example.demo.entity.UserInfo;
 import com.example.demo.form.CreateTaskForm;
 import com.example.demo.form.EditTaskForm;
 import com.example.demo.repository.TaskRepository;
+import com.example.demo.util.UtilToggle;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 @RequiredArgsConstructor
 public class TaskService {
 
@@ -25,8 +27,8 @@ public class TaskService {
 	
 	private final TaskRepository taskDao;
 	
+	private final UtilToggle util;
 	
-	@Transactional(rollbackFor = Exception.class)
 	public ResultMsg completeToggle(int taskId) {
 		try {
 			var task = taskDao.findById(taskId).get();
@@ -38,94 +40,51 @@ public class TaskService {
 				if(task.getSubCompleted() == task.getSubTotal() && task.getSubTotal() != 0) {
 					return ResultMsg.UNKNOWN_ERROR;
 				}else {
-					incomplete(task);
+					util.incomplete(task);
 				}
 			}else {
-				complete(task);
+				util.complete(task);
 			}
 		}catch(Exception e) {
 			throw e;
 		}
 		
 		return ResultMsg.EDIT_SUCCEED;
-	}
-	
-	@Transactional(rollbackFor = Exception.class)
-	private void complete(Task task) {
-		try {
-			task.setCompletedFlg(true);
-			task.setUpdatedAt(LocalDateTime.now());
-			task.setCompletedAt(LocalDateTime.now());
-			taskDao.save(task);
-			if(task.getParentId() != null) {
-				var parentTask = taskDao.findById(task.getParentId()).get();
-				var parentSubComp = parentTask.getSubCompleted() + 1;
-				parentTask.setSubCompleted(parentSubComp);
-				
-				if(parentSubComp == parentTask.getSubTotal() && !parentTask.isSubmitFlg()) {
-					complete(parentTask);
-				}
-				taskDao.save(parentTask);
-			}
-			
-		}catch(Exception e) {
-			throw e;
-		}
-	}
-	
-	@Transactional(rollbackFor = Exception.class)
-	private void incomplete(Task task) {
-		try {
-			task.setCompletedFlg(false);
-			task.setUpdatedAt(LocalDateTime.now());
-			taskDao.save(task);
-			if(task.getParentId() != null) {
-				var parentTask = taskDao.findById(task.getParentId()).get();
-				parentTask.setSubCompleted(parentTask.getSubCompleted() - 1);
-				
-				if(parentTask.isCompletedFlg() && !parentTask.isSubmitFlg()) {
-					incomplete(parentTask);
-				}
-				taskDao.save(parentTask);
-			}
-			
-		}catch(Exception e) {
-			throw e;
-		}
 	}
 	
 	
 	public ResultMsg create(CreateTaskForm form) {
 		var task = mapper.map(form, Task.class);
-		var user = new UserInfo(form.getAssignedUserId());
+		UserInfo user;
+		if(form.getAssignedUserId().equals("")) {
+			user = null;
+		}else {
+			user = new UserInfo(form.getAssignedUserId());
+		}
 		task.setAssignedUser(user);
 		task.setCreatedAt(LocalDateTime.now());
 		task.setUpdatedAt(LocalDateTime.now());
+		taskDao.save(task);
 		
-		try {
-			taskDao.save(task);
-			var parentTask = taskDao.findById(task.getParentId()).get();
-			parentTask.setCompletedFlg(false);
-			parentTask.setSubTotal(parentTask.getSubTotal()+1);
-			parentTask.setUpdatedAt(LocalDateTime.now());
-			taskDao.save(parentTask);
-		}catch(Exception e) {
-			throw e;
-		}
+		var parentTask = taskDao.findById(task.getParentId()).get();
+		parentTask.setCompletedFlg(false);
+		parentTask.setSubTotal(parentTask.getSubTotal()+1);
+		parentTask.setUpdatedAt(LocalDateTime.now());
+		taskDao.save(parentTask);
 		
 		return ResultMsg.EDIT_SUCCEED;
 	}
 	
-	@Transactional
 	public ResultMsg delete(int taskId) {
 		var task = taskDao.findById(taskId).get();
 		var compFrg = task.isCompletedFlg();
+		var submitFlg = task.isSubmitFlg();
 		
 		var parentTask = taskDao.findById(task.getParentId()).get();
 		var subComp = parentTask.getSubCompleted();
 		var subTotal = parentTask.getSubTotal();
 		
-		if(compFrg) {
+		if(compFrg && !submitFlg) {
 			subComp --;
 			subTotal --;
 		}else {
@@ -135,26 +94,49 @@ public class TaskService {
 		parentTask.setSubTotal(subTotal);
 		parentTask.setUpdatedAt(LocalDateTime.now());
 		
-		try {
-			taskDao.delete(task);
-			taskDao.save(parentTask);
-			if(subComp == subTotal && !parentTask.isCompletedFlg()) {
-				complete(parentTask);
-			}
-		}catch(Exception e) {
-			throw e;
+		taskDao.delete(task);
+		taskDao.save(parentTask);
+		if(subComp == subTotal && !parentTask.isCompletedFlg() && !parentTask.isSubmitFlg()) {
+			util.complete(parentTask);
 		}
 		
 		return ResultMsg.EDIT_SUCCEED;
 	}
 	
-	@Transactional
-	public ResultMsg update(EditTaskForm form) {
+	
+	public ResultMsg update(String userId, String ownerId, EditTaskForm form) {
 		var task = taskDao.findById(form.getTaskId()).get();
+		if(task.isSubmitFlg() != form.isSubmitFlg()) {
+			if(!userId.equals(ownerId)) {
+				return ResultMsg.UNKNOWN_ERROR;
+			}else if(task.isSubmitFlg() && task.isCompletedFlg()) {
+				util.cancel(task, ownerId);
+				util.complete(task);
+			}else if(!task.isSubmitFlg() && task.isCompletedFlg()) {
+				util.incomplete(task);
+			}
+		}
 		mapper.map(form, task);
-		task.setAssignedUser(new UserInfo(form.getAssignedUserId()));
+		if(form.getAssignedUserId().equals("")) {
+			task.setAssignedUser(null);
+		}else {
+			task.setAssignedUser(new UserInfo(form.getAssignedUserId()));
+		}
 		task.setUpdatedAt(LocalDateTime.now());
 		taskDao.save(task);
+		return ResultMsg.EDIT_SUCCEED;
+	}
+	
+	
+	public ResultMsg getTask(String userId, int taskId) {
+		var task = taskDao.findById(taskId).get();
+		task.setAssignedUser(new UserInfo(userId));
+		task.setUpdatedAt(LocalDateTime.now());
+		if(task.isCompletedFlg() && task.isSubmitFlg()) {
+			task.setCompletedFlg(false);
+		}
+		taskDao.save(task);
+		
 		return ResultMsg.EDIT_SUCCEED;
 	}
 	

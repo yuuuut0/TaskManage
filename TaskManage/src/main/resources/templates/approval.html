@@ -11,6 +11,7 @@
     <div th:insert="~{common/sourceList :: sourceList}"></div>
     <div th:replace="~{common/header :: header}"></div>
     <div th:insert="~{common/sidebar :: sidebar}"></div>
+    <div th:replace="~{common/taskOffcanvas :: taskOffcanvas}"></div>
     <!-- 
 	
 	main
@@ -18,48 +19,357 @@
 	-->
     <main class="" id="main">
       <div class="container-fluid pt-3 px-3">
-        <div class="mb-4">
-          <h3 class="mb-3">テキストテキスト</h3>
-          <div class="d-flex overflow-x-auto ms-4">
-            <div class="card me-3" style="min-width: 18rem">
-              <div class="card-body">
-                <h5 class="card-title">田中</h5>
-                <h6 class="card-subtitle mb-2 text-body-secondary">
-                  見積書の作成
-                </h6>
-                <div class="row mb-1">
-                  <div class="col-sm-4">
-                    <small class="text-body-secondary">締め切り</small>
+        <div class="d-flex justify-content-between">
+          <div></div>
+          <div
+            class="btn-group mb-3 text-center"
+            role="group"
+            aria-label="Basic radio toggle button group"
+          >
+            <input
+              type="radio"
+              class="btn-check"
+              name="btnradio"
+              id="btnradio1"
+              autocomplete="off"
+              checked
+            />
+            <label class="btn btn-outline-primary" for="btnradio1"
+              >承認依頼</label
+            >
+
+            <input
+              type="radio"
+              class="btn-check"
+              name="btnradio"
+              id="btnradio2"
+              autocomplete="off"
+            />
+            <label class="btn btn-outline-success" for="btnradio2"
+              >申請結果</label
+            >
+          </div>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="approvalToggle"
+              th:checked="${log}"
+            />
+            <label class="form-check-label" for="approvalToggle"
+              >履歴を表示</label
+            >
+          </div>
+        </div>
+        <div
+          class="alert alert-danger alert-dismissible fade show d-flex align-items-center mt-2"
+          role="alert"
+          th:if="${error != null}"
+        >
+          <div th:text="${error}"></div>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div th:replace="~{common/alert :: alert}"></div>
+        <div id="unapproved">
+          <h5
+            class="text-body-tertiary text-center pe-5 me-5 pt-3"
+            th:if="${unapprovedList.isEmpty}"
+          >
+            現在、承認依頼はありません。
+          </h5>
+          <div class="mb-4" th:each="unapproved : ${unapprovedList}">
+            <h3 class="mb-3" th:text="${unapproved.title}"></h3>
+            <div class="d-flex overflow-x-auto ms-4">
+              <div
+                class="card me-3"
+                style="min-width: 18rem"
+                th:each="approval : ${unapproved.approvalList}"
+              >
+                <div class="card-body">
+                  <div class="d-flex justify-content-between">
+                    <h5
+                      class="card-title"
+                      th:text="${approval.assignee.username}"
+                    ></h5>
+                    <a
+                      type="button"
+                      class="task-info-btn"
+                      data-bs-toggle="offcanvas"
+                      data-bs-target="#offcanvasScrolling"
+                      aria-controls="offcanvasScrolling"
+                      th:attr="
+														data-task-id=${approval.task.taskId},
+														data-title=${approval.task.title},
+														data-description=${approval.task.description},
+														data-assigned-user-id=${approval.task.assignedUser != null ? approval.task.assignedUser.userId : ''},
+														data-assigned-user-name=${approval.task.assignedUser != null ? approval.task.assignedUser.username : 'free'},
+														data-priority=${approval.task.priority},
+														data-deadline=${approval.task.deadline},
+														data-sub-completed=${approval.task.subCompleted},
+														data-sub-total=${approval.task.subTotal},
+														data-submit-flg=${approval.task.submitFlg},
+														data-completed-flg=${approval.task.completedFlg},
+														data-parent-title=${unapproved.title},
+														data-owner-id=${unapproved.ownerId},
+														data-owner-name=${unapproved.ownerName},
+														data-created-at=${approval.task.createdAt},
+														data-updated-at=${approval.task.updatedAt},
+														data-completed-at=${approval.task.completedAt}
+													"
+                    >
+                      <i class="bi bi-info-circle text-body-tertiary"></i>
+                    </a>
                   </div>
-                  <div class="col-sm-7">
-                    <small class="text-body-secondary">09/12 12:00</small>
+                  <h6
+                    class="card-subtitle mb-2 text-body-secondary"
+                    th:text="${approval.task.title}"
+                  ></h6>
+                  <div class="row mb-1">
+                    <div class="col-sm-4">
+                      <small class="text-body-secondary">締め切り</small>
+                    </div>
+                    <div class="col-sm-7">
+                      <small
+                        class="text-body-secondary"
+                        th:text="${approval.task.deadline != null ? #temporals.format(approval.task.deadline, 'M/d HH:mm') : ''}"
+                      ></small>
+                    </div>
                   </div>
+                  <div class="row mb-1">
+                    <div class="col-sm-4">
+                      <small class="text-body-secondary">提出日時</small>
+                    </div>
+                    <div class="col-sm-7">
+                      <small
+                        class="text-body-secondary"
+                        th:text="${approval.submittedAt != null ? #temporals.format(approval.submittedAt, 'M/d HH:mm') : ''}"
+                      ></small>
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-sm-4">
+                      <small class="text-body-secondary">承認日時</small>
+                    </div>
+                    <div class="col-sm-7">
+                      <small
+                        class="text-body-secondary"
+                        th:text="${approval.approvedAt != null ? #temporals.format(approval.approvedAt, 'M/d HH:mm') : ''}"
+                      ></small>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <h6 class="form-label text-body-secondary">comment</h6>
+                    <textarea
+                      class="form-control"
+                      rows="4"
+                      th:text="${approval.comment}"
+                    ></textarea>
+                  </div>
+                  <form th:action="@{/approval}" method="post">
+                    <input
+                      type="text"
+                      name="approvalId"
+                      th:value="${approval.approvalId}"
+                      hidden
+                    />
+                    <div class="mb-3">
+                      <h6 class="form-label text-body-secondary">reply</h6>
+                      <textarea
+                        class="form-control"
+                        name="reply"
+                        rows="2"
+                        th:text="${approval.reply != null ? approval.reply : ''}"
+                      ></textarea>
+                    </div>
+                    <div th:if="${!log}">
+                      <div class="d-flex justify-content-evenly">
+                        <button
+                          class="btn btn-outline-primary btn-lg"
+                          type="submit"
+                          name="approve"
+                          value="true"
+                        >
+                          <i class="bi bi-check-circle me-2"></i>承認
+                        </button>
+                        <button
+                          class="btn btn-outline-danger btn-lg"
+                          type="submit"
+                          name="approve"
+                          value="false"
+                        >
+                          <i class="bi bi-arrow-return-left me-2"></i>却下
+                        </button>
+                      </div>
+                    </div>
+                    <!-- 履歴表示モード -->
+                    <div th:if="${log}">
+                      <div class="d-flex justify-content-evenly">
+                        <button
+                          class="btn btn-lg"
+                          th:classappend="${approval.result ? 'btn-primary' : 'btn-outline-primary'}"
+                          disabled
+                        >
+                          <i class="bi bi-check-circle me-2"></i>承認
+                        </button>
+                        <button
+                          class="btn btn-lg"
+                          th:classappend="${approval.result ? 'btn-outline-danger' : 'btn-danger'}"
+                          disabled
+                        >
+                          <i class="bi bi-arrow-return-left me-2"></i>却下
+                        </button>
+                      </div>
+                    </div>
+                  </form>
                 </div>
-                <div class="row mb-3">
-                  <div class="col-sm-4">
-                    <small class="text-body-secondary">提出日時</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="requests">
+          <h5
+            class="text-body-tertiary text-center pe-5 me-5 pt-3"
+            th:if="${requestsList.isEmpty}"
+          >
+            未読の申請結果はありません。
+          </h5>
+          <div class="mb-4" th:each="requests : ${requestsList}">
+            <h3 class="mb-3" th:text="${requests.title}"></h3>
+            <div class="d-flex overflow-x-auto ms-4">
+              <div
+                class="card me-3"
+                style="min-width: 18rem"
+                th:each="approval : ${requests.approvalList}"
+              >
+                <div class="card-body">
+                  <div class="d-flex justify-content-between">
+                    <h5
+                      class="card-title"
+                      th:text="${approval.approver.username}"
+                    ></h5>
+                    <a
+                      type="button"
+                      class="task-info-btn"
+                      data-bs-toggle="offcanvas"
+                      data-bs-target="#offcanvasScrolling"
+                      aria-controls="offcanvasScrolling"
+                      th:attr="
+														data-task-id=${approval.task.taskId},
+														data-title=${approval.task.title},
+														data-description=${approval.task.description},
+                            data-assigned-user-id=${approval.task.assignedUser != null ? approval.task.assignedUser.userId : ''},
+														data-assigned-user-name=${approval.task.assignedUser != null ? approval.task.assignedUser.username : 'free'},
+														data-priority=${approval.task.priority},
+														data-deadline=${approval.task.deadline},
+														data-sub-completed=${approval.task.subCompleted},
+														data-sub-total=${approval.task.subTotal},
+														data-submit-flg=${approval.task.submitFlg},
+														data-completed-flg=${approval.task.completedFlg},
+														data-parent-title=${requests.title},
+														data-owner-id=${requests.ownerId},
+														data-owner-name=${requests.ownerName},
+														data-created-at=${approval.task.createdAt},
+														data-updated-at=${approval.task.updatedAt},
+														data-completed-at=${approval.task.completedAt}
+													"
+                    >
+                      <i class="bi bi-info-circle text-body-tertiary"></i>
+                    </a>
                   </div>
-                  <div class="col-sm-7">
-                    <small class="text-body-secondary">09/12 23:00</small>
+                  <h6
+                    class="card-subtitle mb-2 text-body-secondary"
+                    th:text="${approval.task.title}"
+                  ></h6>
+                  <div class="row mb-1">
+                    <div class="col-sm-4">
+                      <small class="text-body-secondary">締め切り</small>
+                    </div>
+                    <div class="col-sm-7">
+                      <small
+                        class="text-body-secondary"
+                        th:text="${approval.task.deadline != null ? #temporals.format(approval.task.deadline, 'M/d HH:mm') : ''}"
+                      ></small>
+                    </div>
                   </div>
-                </div>
-                <div class="mb-3">
-                  <h6 class="form-label text-body-secondary">comment</h6>
-                  <textarea class="form-control" rows="4">
-コメントコメント</textarea
+                  <div class="row mb-1">
+                    <div class="col-sm-4">
+                      <small class="text-body-secondary">提出日時</small>
+                    </div>
+                    <div class="col-sm-7">
+                      <small
+                        class="text-body-secondary"
+                        th:text="${approval.submittedAt != null ? #temporals.format(approval.submittedAt, 'M/d HH:mm') : ''}"
+                      ></small>
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-sm-4">
+                      <small class="text-body-secondary">承認日時</small>
+                    </div>
+                    <div class="col-sm-7">
+                      <small
+                        class="text-body-secondary"
+                        th:text="${approval.approvedAt != null ? #temporals.format(approval.approvedAt, 'M/d HH:mm') : ''}"
+                      ></small>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <h6 class="form-label text-body-secondary">comment</h6>
+                    <textarea
+                      class="form-control"
+                      rows="4"
+                      th:text="${approval.comment}"
+                    ></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <h6 class="form-label text-body-secondary">reply</h6>
+                    <textarea
+                      class="form-control"
+                      rows="2"
+                      th:text="${approval.reply}"
+                    ></textarea>
+                  </div>
+                  <div
+                    class="d-flex justify-content-evenly"
+                    th:classappend="${log ? '' : 'mb-3'}"
                   >
-                </div>
-                <div class="mb-3">
-                  <h6 class="form-label text-body-secondary">reply</h6>
-                  <textarea class="form-control" rows="2"></textarea>
-                </div>
-                <div class="d-flex justify-content-evenly">
-                  <button class="btn btn-outline-primary btn-lg">
-                    <i class="bi bi-check-circle me-2"></i>承認
-                  </button>
-                  <button class="btn btn-outline-danger btn-lg">
-                    <i class="bi bi-arrow-return-left me-2"></i>却下
-                  </button>
+                    <button
+                      class="btn btn-lg"
+                      th:classappend="${approval.result ? 'btn-primary' : 'btn-outline-primary'}"
+                      disabled
+                    >
+                      <i class="bi bi-check-circle me-2"></i>承認
+                    </button>
+                    <button
+                      class="btn btn-lg"
+                      th:classappend="${approval.result ? 'btn-outline-danger' : 'btn-danger'}"
+                      disabled
+                    >
+                      <i class="bi bi-arrow-return-left me-2"></i>却下
+                    </button>
+                  </div>
+                  <!-- 履歴モードでは非表示 -->
+                  <div th:if="${!log}">
+                    <div class="d-flex justify-content-center">
+                      <form th:action="@{/approval}" method="post">
+                        <input
+                          type="text"
+                          name="approvalId"
+                          th:value="${approval.approvalId}"
+                          hidden
+                        />
+                        <button class="btn btn-outline-secondary" name="read">
+                          確認済みにする
+                        </button>
+                      </form>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

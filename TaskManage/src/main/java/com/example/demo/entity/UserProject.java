@@ -49,5 +49,10 @@ public class UserProject {
 	@Column(name = "requests_count")
 	private int RequestsCount;
     
-	public UserProject(UserProjectId id, UserInfo user, Project project, String handle) {};
+	public UserProject(UserProjectId id, UserInfo user, Project project, String handle) {
+		this.id = id;
+		this.userInfo = user;
+		this.project = project;
+		this.handle = handle;
+	};
 }

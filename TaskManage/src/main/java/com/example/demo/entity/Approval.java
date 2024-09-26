@@ -31,8 +31,9 @@ public class Approval {
     @JoinColumn(name = "approver_id")
     private UserInfo approver;
 
-    @Column(name = "assignee_id")
-    private String assigneeId;
+	@ManyToOne
+    @JoinColumn(name = "assignee_id")
+    private UserInfo assignee;
 
     @Size(max = 80)
     private String comment;
@@ -53,4 +54,7 @@ public class Approval {
     private boolean assigneeFlg;
 
     private boolean result;
+    
+    @Column(name = "project_id")
+    private String projectId;
 }

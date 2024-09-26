@@ -1,8 +1,8 @@
 package com.example.demo.dto;
 
+import java.util.HashMap;
 import java.util.List;
 
-import com.example.demo.domain.Member;
 import com.example.demo.domain.ProjectInfo;
 import com.example.demo.entity.Project;
 import com.example.demo.entity.Task;
@@ -17,7 +17,7 @@ public class BaseDto {
 	
 	private ProjectInfo nowProjectInfo;
 	
-	private List<Member> memberList;
+	private HashMap<String, String> memberMap;
 	
 	private List<Project> joinedProjectList;
 	

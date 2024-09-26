@@ -18,11 +18,9 @@ public interface TaskRepository extends JpaRepository<Task, Integer>{
 			+ "AND t.projectId = ?2")
 	List<Integer> findParentTaskIdList(String userId, String projectId);
 	
-	
-	@Query("SELECT t "
-			+ "FROM Task t "
-			+ "WHERE t.parentId = ?1")
-	List<Task> findSubTasksByParentId(int parentId);
+	List<Task> findAllByParentId(int parentId);
 	
 	List<Task> findAllByParentIdAndAssignedUser(Integer parentId, UserInfo assignedUser);
+	
+	List<Task> findAllByProjectIdAndAssignedUserNull(String projectId);
 }
