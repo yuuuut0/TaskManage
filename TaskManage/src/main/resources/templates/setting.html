@@ -18,81 +18,64 @@
 	-->
     <main class="" id="main">
       <div class="container-fluid p-3">
-        <div class="fs-3 my-4 text-secondary text-center">
-          ユーザー設定画面
-        </div>
+        <div class="fs-3 my-4 text-secondary text-center">ユーザー設定画面</div>
         <div th:replace="~{common/alert :: alert}"></div>
 
+          <div class="row mb-3">
+            <div class="col-5 modal-label text-end"
+              >user ID</div
+            >
+            <div class="col-3">
+              <input
+                type="text"
+                class="form-control-plaintext"
+                th:value="${user.userId}"
+                disabled
+              />
+            </div>
+          </div>
+        <form th:action="@{/user}" method="post">
+          <div class="row mb-3">
+            <label for="set-username" class="col-5 modal-label text-end"
+              >username</label
+            >
+            <div class="col-3">
+              <input
+                type="text"
+                class="form-control-plaintext"
+                id="set-username"
+                name="setString"
+                th:value="${user.username}"
+                disabled
+                data-input-id="username"
+                required
+                maxlength="30"
+              />
+            </div>
+            <div class="col-1">
+              <button
+                type="button"
+                class="btn user-toggle"
+                data-input-id="username"
+              >
+                <i class="bi bi-pencil-square text-secondary"></i>
+              </button>
+            </div>
+            <div class="col-2">
+              <button
+                class="btn btn-outline-secondary"
+                data-btn-id="username"
+                hidden
+                name="set"
+                value="username"
+              >
+                変更
+              </button>
+            </div>
+          </div>
+        </form>
         <div class="row mb-3">
-          <label for="set-user-id" class="col-6 modal-label text-end">user ID</label>
-          <div class="col-3">
-            <input
-              type="text"
-              class="form-control-plaintext"
-              id="set-user-id"
-              name="setString"
-              th:value="${user.userId}"
-              disabled
-              data-input-id="user-id"
-            />
-          </div>
-          <div class="col-1">
-            <button
-              type="button"
-              class="btn user-toggle"
-              data-input-id="user-id"
-            >
-              <i class="bi bi-pencil-square text-secondary"></i>
-            </button>
-          </div>
-          <div class="col-2">
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              data-btn-id="user-id"
-              hidden
-            >
-              変更
-            </button>
-          </div>
-        </div>
-        <div class="row mb-3">
-          <label for="set-username" class="col-6 modal-label text-end"
-            >username</label
-          >
-          <div class="col-3">
-            <input
-              type="text"
-              class="form-control-plaintext"
-              id="set-username"
-              th:value="${user.username}"
-              disabled
-              data-input-id="username"
-            />
-          </div>
-          <div class="col-1">
-            <button
-              type="button"
-              class="btn user-toggle"
-              data-input-id="username"
-              
-            >
-              <i class="bi bi-pencil-square text-secondary"></i>
-            </button>
-          </div>
-          <div class="col-2">
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              data-btn-id="username"
-              hidden
-            >
-              変更
-            </button>
-          </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-6 modal-label text-end">now project</div>
+          <div class="col-5 modal-label text-end">now project</div>
           <div class="col-3">
             <input
               type="text"
@@ -103,44 +86,56 @@
           </div>
         </div>
         <div th:if="${nowProjectInfo != null}">
-          <div class="row mb-3">
-            <label for="set-handle" class="col-6 modal-label text-end">handle</label>
-            <div class="col-3">
-              <input
-                type="text"
-                class="form-control-plaintext"
-                id="set-handle"
-                th:value="${user.handle}"
-                disabled
-                data-input-id="handle"
-              />
-            </div>
-            <div class="col-1">
-              <button
-                type="button"
-                class="btn user-toggle"
-                data-input-id="handle"
-                
+          <form th:action="@{/user}" method="post">
+            <div class="row mb-3">
+              <label for="set-handle" class="col-5 modal-label text-end"
+                >handle</label
               >
-                <i class="bi bi-pencil-square text-secondary"></i>
-              </button>
+              <div class="col-3">
+                <input
+                  type="text"
+                  name="projectId"
+                  th:value="${nowProjectInfo.projectId}"
+                  hidden
+                />
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="set-handle"
+                  name="setString"
+                  th:value="${user.handle}"
+                  disabled
+                  data-input-id="handle"
+                  required
+                  maxlength="4"
+                />
+              </div>
+              <div class="col-1">
+                <button
+                  type="button"
+                  class="btn user-toggle"
+                  data-input-id="handle"
+                >
+                  <i class="bi bi-pencil-square text-secondary"></i>
+                </button>
+              </div>
+              <div class="col-2">
+                <button
+                  class="btn btn-outline-secondary"
+                  data-btn-id="handle"
+                  hidden
+                  name="set"
+                  value="handle"
+                >
+                  変更
+                </button>
+              </div>
             </div>
-            <div class="col-2">
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                data-btn-id="handle"
-                hidden
-              >
-                変更
-              </button>
-            </div>
-          </div>
+          </form>
           <div class="text-center mt-5 pt-5">
             <a
               class="text-secondary mb-3"
               type="button"
-              id="code-trigger"
               data-bs-toggle="modal"
               data-bs-target="#userExitModal"
             >
@@ -152,7 +147,6 @@
           <a
             class="text-secondary mb-3"
             type="button"
-            id="code-trigger"
             data-bs-toggle="modal"
             data-bs-target="#userDeleteModal"
           >
@@ -163,79 +157,73 @@
     </main>
 
     <div
-        class="modal fade"
-        id="userExitModal"
-        aria-hidden="true"
-        tabindex="-1"
-        th:if="${nowProjectInfo != null}"
-      >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5">※注意</h1>
-            </div>
-            <div class="modal-body">
-              抜ける際、プロジェクト内のすべての担当から外れます。<br>
-            </div>
-            <div class="modal-footer d-flex justify-content-between">
-              <form th:action="@{/project}" method="post">
-                <button
-                  class="btn btn-danger"
-                  name="delete"
-                  
-                >
-                  削除
-                </button>
-              </form>
-              <button
-                class="btn btn-secondary"
-                data-bs-target="#userSetting"
-                data-bs-toggle="modal"
-              >
-                close
+      class="modal fade"
+      id="userExitModal"
+      aria-hidden="true"
+      tabindex="-1"
+      th:if="${nowProjectInfo != null}"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">※注意</h1>
+          </div>
+          <div class="modal-body">
+            抜ける際、プロジェクト内のすべての担当から外れます。<br>
+            <br>
+            また、あなたがこのプロジェクトのリーダーの場合、プロジェクトは削除されます。
+          </div>
+          <div class="modal-footer d-flex justify-content-between">
+            <form th:action="@{/user}" method="post">
+              <input type="text" name="projectId" th:value="${nowProjectInfo.projectId}" hidden>
+              <button class="btn btn-outline-danger" name="exit">
+                プロジェクトを外れる
               </button>
-            </div>
+            </form>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-target="#userExitModal"
+              data-bs-toggle="modal"
+            >
+              close
+            </button>
           </div>
         </div>
       </div>
+    </div>
 
-
-      <div
-        class="modal fade"
-        id="userDeleteModal"
-        aria-hidden="true"
-        tabindex="-1"
-      >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5">※注意</h1>
-            </div>
-            <div class="modal-body">
-              あなたがリーダーであるprojectは削除されます。<br>
-              また、各projectにおいてあなたのタスクの担当から外れます。
-            </div>
-            <div class="modal-footer d-flex justify-content-between">
-              <form th:action="@{/project}" method="post">
-                <button
-                  class="btn btn-danger"
-                  name="delete"
-                  
-                >
-                  削除
-                </button>
-              </form>
-              <button
-                class="btn btn-secondary"
-                data-bs-target="#userSetting"
-                data-bs-toggle="modal"
-              >
-                close
-              </button>
-            </div>
+    <div
+      class="modal fade"
+      id="userDeleteModal"
+      aria-hidden="true"
+      tabindex="-1"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">※注意</h1>
+          </div>
+          <div class="modal-body">
+            あなたがリーダーであるprojectは削除されます。<br />
+            また、各projectにおいてあなたのタスクの担当から外れます。
+          </div>
+          <div class="modal-footer d-flex justify-content-between">
+            <form th:action="@{/user}" method="post">
+              <button class="btn btn-outline-danger" name="delete">アカウント削除</button>
+            </form>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-target="#userDeleteModal"
+              data-bs-toggle="modal"
+            >
+              close
+            </button>
           </div>
         </div>
       </div>
+    </div>
 
     <script th:src="@{/main.js}"></script>
   </body>

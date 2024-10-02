@@ -3,7 +3,7 @@
   <body>
     <div th:fragment="alert">
       <div
-          class="alert alert-danger alert-dismissible fade show d-flex align-items-center mt-2"
+          class="alert alert-danger alert-dismissible fade show d-flex align-items-center mt-3"
           role="alert"
           th:if="${error != null}"
         >
@@ -16,7 +16,7 @@
           ></button>
         </div>
         <div
-          class="alert alert-dismissible fade show d-flex align-items-center mt-2"
+          class="alert alert-dismissible fade show d-flex align-items-center mt-3"
           role="alert"
           th:if="${alert != null}"
           th:classappend="${alert?.isError ? 'alert-danger' : 'alert-info'}"

@@ -51,7 +51,7 @@ public class TaskRemoval {
         
         approvalDao.deleteAll(all);
         
-        var subTasks = taskDao.findAllByParentId(task.getTaskId());
+        var subTasks = taskDao.findAllByParentIdAndProjectId(task.getTaskId(), task.getProjectId());
         if(!subTasks.isEmpty()) {
         	taskDao.deleteAll(subTasks);
         }

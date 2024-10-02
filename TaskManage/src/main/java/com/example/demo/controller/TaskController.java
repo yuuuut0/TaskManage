@@ -12,6 +12,7 @@ import com.example.demo.form.EditTaskForm;
 import com.example.demo.service.ApprovalService;
 import com.example.demo.service.TaskService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -25,7 +26,8 @@ public class TaskController {
 	
 	
 	@PostMapping(params = "complete")
-	public String complete(int taskId, RedirectAttributes rs) {
+	public String complete(int taskId, RedirectAttributes rs, HttpServletRequest request) {
+		String referer = request.getHeader("Referer");
 		try {
 			var result = taskService.completeToggle(taskId);
 			rs.addFlashAttribute("alert", result);
@@ -34,12 +36,17 @@ public class TaskController {
 			rs.addFlashAttribute("error", e.getMessage());
 		}
 		
-		return "redirect:/home";
+		if(referer != null) {
+			return "redirect:" + referer;
+		}else {
+			return "redirect:home";
+		}
 		
 	}
 	
 	@PostMapping(params = "submit")
-	public String submit(int taskId, String ownerId, String comment, RedirectAttributes rs) {
+	public String submit(int taskId, String ownerId, String comment, RedirectAttributes rs, HttpServletRequest request) {
+		String referer = request.getHeader("Referer");
 		try {
 			var result = approvalService.submitToggle(taskId, ownerId, comment);
 			rs.addFlashAttribute("alert", result);
@@ -48,11 +55,16 @@ public class TaskController {
 			rs.addFlashAttribute("error", e.getMessage());
 		}
 		
-		return "redirect:/home";
+		if(referer != null) {
+			return "redirect:" + referer;
+		}else {
+			return "redirect:home";
+		}
 	}
 	
 	@PostMapping(params = "delete")
-	public String delete(int taskId, RedirectAttributes rs) {
+	public String delete(int taskId, RedirectAttributes rs, HttpServletRequest request) {
+		String referer = request.getHeader("Referer");
 		try {
 			var result = taskService.delete(taskId);
 			rs.addFlashAttribute("alert", result);
@@ -61,7 +73,11 @@ public class TaskController {
 			rs.addFlashAttribute("error", e.getMessage());
 		}
 		
-		return "redirect:/home";
+		if(referer != null) {
+			return "redirect:" + referer;
+		}else {
+			return "redirect:home";
+		}
 	}
 	
 	@PostMapping(params = "create")
@@ -78,7 +94,8 @@ public class TaskController {
 	}
 	
 	@PostMapping(params = "update")
-	public String edit(@AuthenticationPrincipal User user, String ownerId, EditTaskForm editTaskForm ,RedirectAttributes rs) {
+	public String edit(@AuthenticationPrincipal User user, String ownerId, EditTaskForm editTaskForm ,RedirectAttributes rs, HttpServletRequest request) {
+		String referer = request.getHeader("Referer");
 		var userId = user.getUsername();
 		try {
 			var result = taskService.update(userId, ownerId, editTaskForm);
@@ -88,7 +105,11 @@ public class TaskController {
 			rs.addFlashAttribute("error", e.getMessage());
 		}
 		
-		return "redirect:/home";
+		if(referer != null) {
+			return "redirect:" + referer;
+		}else {
+			return "redirect:home";
+		}
 	}
 	
 	@PostMapping(params = "get")

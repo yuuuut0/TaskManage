@@ -93,7 +93,7 @@
         }
 
         // selectの初期化
-        if(isEditing){
+        if (isEditing) {
           $modal.querySelector(".search-input").value = "";
           $modal.querySelector(".search-button").click();
           $modal.querySelector(".search-select").selectedIndex = 0;
@@ -123,9 +123,9 @@
 
         //注意書きの表示
         const formWarning = $modal.querySelector(".form-warning");
-        if(isEditing){
+        if (isEditing) {
           formWarning.setAttribute("hidden", "hidden");
-        }else{
+        } else {
           formWarning.removeAttribute("hidden");
         }
 
@@ -138,7 +138,7 @@
     $modal.addEventListener("hidden.bs.modal", function () {
       // どちらかの編集モードが有効の場合、プログラム的に解除
       const editTrigger = document.querySelector("#edit-trigger-project");
-      if(editTrigger){
+      if (editTrigger) {
         if (editTrigger.classList.contains("editing")) {
           editTrigger.click();
         } else if (
@@ -168,7 +168,7 @@
       .querySelector("#collapseEditCode")
       .addEventListener("shown.bs.collapse", function () {
         const editTrigger = document.querySelector("#edit-trigger-project");
-        if(editTrigger){
+        if (editTrigger) {
           if (editTrigger.classList.contains("editing")) {
             editTrigger.click();
           }
@@ -258,14 +258,16 @@
               element.classList.add("form-control"); // 通常クラスに変更
             }
           });
-        
-        //提出フラグに関するcheckboxの処理(注：処理の順番が逆)
+
+        //提出フラグに関するcheckboxの処理
         const checkbox = offcanvasElement.querySelector("#form-check");
         const ownerId = offcanvasElement.querySelector("#form-owner-id").value;
-        if(!isEditing && loginUserId == ownerId){
-          checkbox.removeAttribute("hidden");
-        }else{
-          checkbox.setAttribute('hidden', 'hidden');
+        if (loginUserId == ownerId) {
+          if (isEditing) {
+            checkbox.setAttribute("hidden", "hidden");
+          } else {
+            checkbox.removeAttribute("hidden");
+          }
         }
 
         // priority のラジオボタンに関する処理
@@ -282,32 +284,41 @@
             }
           });
 
-        // select[class="edit"] の処理
-        const selectElement = offcanvasElement.querySelector('select[class~="edit"]');
-        if (isEditing) {
-          selectElement.setAttribute("disabled", "disabled");
-          selectElement.classList.remove("form-select");
-          selectElement.classList.add("form-control-plaintext");
-        } else {
-          selectElement.removeAttribute("disabled");
-          selectElement.classList.remove("form-control-plaintext");
-          selectElement.classList.add("form-select");
-        }
+        if (
+          offcanvasElement.querySelector("#form-connect-flg").value == "false"
+        ) {
+          // select[class="edit"] の処理
+          const selectElement = offcanvasElement.querySelector(
+            'select[class~="edit"]'
+          );
+          if (isEditing) {
+            selectElement.setAttribute("disabled", "disabled");
+            selectElement.classList.remove("form-select");
+            selectElement.classList.add("form-control-plaintext");
+          } else {
+            selectElement.removeAttribute("disabled");
+            selectElement.classList.remove("form-control-plaintext");
+            selectElement.classList.add("form-select");
+          }
 
-        // select 隣の input と button の hidden の切り替え
-        const inputElement = selectElement.nextElementSibling; // input
-        const buttonElement = inputElement.nextElementSibling; // button
-        if (isEditing) {
-          inputElement.setAttribute("hidden", "hidden");
-          buttonElement.setAttribute("hidden", "hidden");
-        } else {
-          inputElement.removeAttribute("hidden");
-          buttonElement.removeAttribute("hidden");
+          // select 隣の input と button の hidden の切り替え
+          const inputElement = selectElement.nextElementSibling; // input
+          const buttonElement = inputElement.nextElementSibling; // button
+          if (isEditing) {
+            inputElement.setAttribute("hidden", "hidden");
+            buttonElement.setAttribute("hidden", "hidden");
+          } else {
+            inputElement.removeAttribute("hidden");
+            buttonElement.removeAttribute("hidden");
+          }
         }
 
         // 検索ボタンや他の hidden 要素を表示/非表示
         offcanvasElement
-          .querySelectorAll("input[hidden][name]:not([id='form-owner-id']), button[hidden][name]")
+          .querySelector("#task-update-form")
+          .querySelectorAll(
+            "input[hidden][name]:not([id='form-owner-id']), button[hidden][name]"
+          )
           .forEach(function (element) {
             if (isEditing) {
               element.setAttribute("hidden", "hidden"); // 非表示に戻す
@@ -337,14 +348,13 @@
         //submit用コメントをdisabledにする
         const comment = document.getElementById("form-comment");
         const commentBox = comment.parentElement;
-        if(commentBox.className != 'd-none'){
-          if(isEditing){
-            comment.removeAttribute('disabled');
-          }else{
-            comment.setAttribute('disabled','disabled');
+        if (commentBox.className != "d-none") {
+          if (isEditing) {
+            comment.removeAttribute("disabled");
+          } else {
+            comment.setAttribute("disabled", "disabled");
           }
         }
-
 
         // ボタンの状態をトグルする
         this.classList.toggle("editing");
@@ -363,33 +373,27 @@
     });
 
     //完了ボタンと更新ボタンの処理
-    document
-      .querySelectorAll(".hidden-form-trigger")
-      .forEach((button) => {
-        button.addEventListener("click", function (event) {
-          // ボタンの value を取得
-          const buttonValue = event.target.value;
+    document.querySelectorAll(".hidden-form-trigger").forEach((button) => {
+      button.addEventListener("click", function (event) {
+        // ボタンの value を取得
+        const buttonValue = event.target.value;
 
-          if(buttonValue == 'submit'){
-            const ownerId = document.getElementById("hidden-form-owner-id");
-            const comment = document.getElementById("hidden-form-comment");
+        if (buttonValue == "submit") {
+          const ownerId = document.getElementById("hidden-form-owner-id");
+          const comment = document.getElementById("hidden-form-comment");
 
-            ownerId.removeAttribute('disabled');
-            comment.removeAttribute('disabled');
-            comment.value = document.getElementById("form-comment").value;
-          }
+          ownerId.removeAttribute("disabled");
+          comment.removeAttribute("disabled");
+          comment.value = document.getElementById("form-comment").value;
+        }
 
-          // 隠れた submit ボタンの name 属性に値を設定
-          document.getElementById("hidden-form-submit").name =
-            buttonValue;
+        // 隠れた submit ボタンの name 属性に値を設定
+        document.getElementById("hidden-form-submit").name = buttonValue;
 
-          // 隠れたフォームを送信
-          document.getElementById("hidden-form-submit").click();
-        });
-      }
-    );
-
-      
+        // 隠れたフォームを送信
+        document.getElementById("hidden-form-submit").click();
+      });
+    });
   }
   /**
    * 編集用offcanvas処理終了
@@ -398,10 +402,9 @@
   /**
    * project編集モーダルが表示される前に実行されるイベントリスナー
    */
-  if (document.querySelector("#project-info-btn")) {
-    document
-      .querySelector("#project-info-btn")
-      .addEventListener("click", function () {
+  if (document.querySelectorAll(".project-info-btn").length > 0) {
+    document.querySelectorAll(".project-info-btn").forEach((button) => {
+      button.addEventListener("click", function () {
         // 押されたボタンからdata-*属性を取得
         const name = this.getAttribute("data-name");
         const description = this.getAttribute("data-description");
@@ -413,10 +416,11 @@
         document.querySelector("#edit-name").value = name;
         document.querySelector("#edit-description").value = description;
         document.querySelector("#edit-first-task").value = firstTask;
-        document.querySelector("#edit-task-description").value = taskDescription;
+        document.querySelector("#edit-task-description").value =
+          taskDescription;
         document.querySelector("#edit-deadline").value = deadline;
-
       });
+    });
   }
 
   /**
@@ -435,6 +439,7 @@
       const assignedUserName = button.getAttribute("data-assigned-user-name");
       const submitFlg = button.getAttribute("data-submit-flg") === "true";
       const completedFlg = button.getAttribute("data-completed-flg") === "true";
+      const connectFlg = button.getAttribute("data-connect-flg");
       const deadline = button.getAttribute("data-deadline");
       const subCompleted = button.getAttribute("data-sub-completed");
       const subTotal = button.getAttribute("data-sub-total");
@@ -445,19 +450,20 @@
       const updatedAt = button.getAttribute("data-updated-at");
       const completedAt = button.getAttribute("data-completed-at");
       const priority = button.getAttribute("data-priority");
-      
 
       // オフキャンバス内のフォーム要素を更新
       taskEditForm.querySelector("#form-task-id").value = taskId;
+      taskEditForm.querySelector("#disconnect-task-id").value = taskId;
       taskEditForm.querySelector("#hidden-form-task-id").value = taskId;
       taskEditForm.querySelector("#hidden-form-owner-id").value = ownerId;
       taskEditForm.querySelector("#form-title").value = title;
       taskEditForm.querySelector("#form-description").value = description;
       taskEditForm.querySelector("#form-assigned-user-selected").value =
-        assignedUserId ? assignedUserId : '';
+        assignedUserId ? assignedUserId : "";
       taskEditForm.querySelector("#form-assigned-user-selected").textContent =
         assignedUserName;
       taskEditForm.querySelector("#form-submit-flg").checked = submitFlg;
+      taskEditForm.querySelector("#form-connect-flg").value = connectFlg;
       taskEditForm.querySelector("#form-deadline").value = deadline;
       taskEditForm.querySelector("#form-sub-completed").value = subCompleted;
       taskEditForm.querySelector("#form-sub-total").value = subTotal;
@@ -467,6 +473,13 @@
       taskEditForm.querySelector("#form-created-at").value = createdAt;
       taskEditForm.querySelector("#form-updated-at").value = updatedAt;
       taskEditForm.querySelector("#form-completed-at").value = completedAt;
+
+      if (document.querySelector("#connect-new-id")) {
+        taskEditForm.querySelector("#connect-new-id").value = taskId;
+        taskEditForm.querySelector("#connect-new-title").value = title;
+        taskEditForm.querySelector("#connect-old-id").value = taskId;
+        taskEditForm.querySelector("#connect-old-title").value = title;
+      }
 
       // 優先度に基づいてラジオボタンを設定
       taskEditForm.querySelectorAll('input[type="radio"]').forEach((radio) => {
@@ -484,36 +497,39 @@
       //alertの表示切替
       const alertBox = taskEditForm.querySelector("#taskEdit-alert");
       const alertIcon = taskEditForm.querySelector("#taskEdit-alert-icon");
-      const alertMessage = taskEditForm.querySelector("#taskEdit-alert-message");
-      alertBox.className = 'alert d-flex align-items-center';
-      if(submitFlg){
-        if(completedFlg){
-          alertBox.classList.add('alert-warning');
-          alertIcon.className = 'bi bi-clock me-2';
-          alertMessage.textContent = '承認を待っています。';
-        }else if(subTotal != 0 && subCompleted == subTotal){
-          alertBox.classList.add('alert-warning');
-          alertIcon.className = 'bi bi-exclamation-triangle me-2';
-          alertMessage.innerHTML = 'サブタスクがすべて達成済みです。<br />承認申請を出しましょう！';
-        }else{
-          alertBox.classList.add('alert-info');
-          alertIcon.className = 'bi bi-exclamation-triangle me-2';
-          alertMessage.textContent = '承認必須のタスクです。';
+      const alertMessage = taskEditForm.querySelector(
+        "#taskEdit-alert-message"
+      );
+      alertBox.className = "alert d-flex align-items-center";
+      if (submitFlg) {
+        if (completedFlg) {
+          alertBox.classList.add("alert-warning");
+          alertIcon.className = "bi bi-clock me-2";
+          alertMessage.textContent = "承認を待っています。";
+        } else if (subTotal != 0 && subCompleted == subTotal) {
+          alertBox.classList.add("alert-warning");
+          alertIcon.className = "bi bi-exclamation-triangle me-2";
+          alertMessage.innerHTML =
+            "サブタスクがすべて達成済みです。<br />承認申請を出しましょう！";
+        } else {
+          alertBox.classList.add("alert-info");
+          alertIcon.className = "bi bi-exclamation-triangle me-2";
+          alertMessage.textContent = "承認必須のタスクです。";
         }
-      }else if(completedFlg){
-        if(subCompleted == subTotal){
-          alertBox.classList.add('alert-success');
-          alertIcon.className = 'bi bi-check-circle me-2';
-          alertMessage.textContent = '達成済みのタスクです';
-        }else{
-          alertBox.classList.add('alert-warning');
-          alertIcon.className = 'bi bi-exclamation-triangle me-2';
-          alertMessage.innerHTML = '達成済みですが、<br />未達成のサブタスクが残っています。';
+      } else if (completedFlg) {
+        if (subCompleted == subTotal) {
+          alertBox.classList.add("alert-success");
+          alertIcon.className = "bi bi-check-circle me-2";
+          alertMessage.textContent = "達成済みのタスクです";
+        } else {
+          alertBox.classList.add("alert-warning");
+          alertIcon.className = "bi bi-exclamation-triangle me-2";
+          alertMessage.innerHTML =
+            "達成済みですが、<br />未達成のサブタスクが残っています。";
         }
-      }else{
-        alertBox.className = 'd-none';
+      } else {
+        alertBox.className = "d-none";
       }
-
 
       taskEditForm
         .querySelector("#form-completed-at-div")
@@ -527,45 +543,61 @@
       const completeButton = document.getElementById("completeButton");
       const comment = document.getElementById("form-comment");
       const commentBox = comment.parentElement;
-      comment.setAttribute('disabled', 'disabled')
-      commentBox.className = 'd-none';
-      if(loginUserId == assignedUserId){
-        if(submitFlg){
-          if(completedFlg){
-            completeButton.className = 'btn btn-warning hidden-form-trigger';
-            completeButton.innerText = '申請を取り下げる';
-            completeButton.value = 'submit';
-          }else{
-            completeButton.className = 'btn btn-primary hidden-form-trigger';
-            completeButton.innerText = '申請';
-            completeButton.value = 'submit'
-            comment.removeAttribute('disabled');
-            commentBox.className = 'col-12'
+      comment.setAttribute("disabled", "disabled");
+      commentBox.className = "d-none";
+      if (loginUserId == assignedUserId && connectFlg == "false") {
+        if (submitFlg) {
+          if (completedFlg) {
+            completeButton.className = "btn btn-warning hidden-form-trigger";
+            completeButton.innerText = "申請を取り下げる";
+            completeButton.value = "submit";
+          } else {
+            completeButton.className = "btn btn-primary hidden-form-trigger";
+            completeButton.innerText = "申請";
+            completeButton.value = "submit";
+            comment.removeAttribute("disabled");
+            commentBox.className = "col-12";
           }
-        }else if(completedFlg){
-          if(subTotal == 0 || subTotal != subCompleted){
-            completeButton.className = 'btn btn-warning hidden-form-trigger';
-            completeButton.innerText = '未達成にする';
-            completeButton.value = 'complete'
-          }else{
-            completeButton.className = 'd-none';
-            completeButton.innerText = '';
+        } else if (completedFlg) {
+          if (subTotal == 0 || subTotal != subCompleted) {
+            completeButton.className = "btn btn-warning hidden-form-trigger";
+            completeButton.innerText = "未達成にする";
+            completeButton.value = "complete";
+          } else {
+            completeButton.className = "d-none";
+            completeButton.innerText = "";
           }
-        }else{
-          completeButton.className = 'btn btn-success hidden-form-trigger';
-          completeButton.innerText = '完了';
-          completeButton.value = 'complete';
+        } else {
+          completeButton.className = "btn btn-success hidden-form-trigger";
+          completeButton.innerText = "完了";
+          completeButton.value = "complete";
         }
-      }else{
-        completeButton.className = 'd-none';
-        completeButton.innerText = '';
+      } else {
+        completeButton.className = "d-none";
+        completeButton.innerText = "";
       }
 
       //担当者か責任者以外の場合編集トリガーをなくす
-      if(loginUserId == ownerId || loginUserId == assignedUserId){
-        $editTrigger.className = "btn me-2"
-      }else{
-        $editTrigger.className = "d-none"
+      if (loginUserId == ownerId || loginUserId == assignedUserId) {
+        $editTrigger.className = "btn me-2";
+      } else {
+        $editTrigger.className = "d-none";
+      }
+
+      //プロジェクト接続済みの場合disconnect-buttonを表示
+      if (loginUserId == assignedUserId) {
+        if (connectFlg == "true") {
+          document.querySelector("#disconnect-button").className =
+            "text-center my-3";
+          document.querySelector("#connect-form").className = "d-none";
+        } else {
+          document.querySelector("#disconnect-button").className = "d-none";
+          document.querySelector("#connect-form").className =
+            "text-center my-3";
+        }
+      } else {
+        document.querySelector("#disconnect-button").className = "d-none";
+        document.querySelector("#connect-form").className = "d-none";
       }
 
       // 担当者の項目を初期化
@@ -606,7 +638,6 @@
           input.checked = false;
         }
       });
-
 
       // 担当者の項目を初期化
       taskNewForm.querySelector(".search-input").value = "";
@@ -681,24 +712,34 @@
       if (this.hasAttribute("data-bs-toggle")) {
         return;
       }
-  
+
       event.preventDefault();
-  
+
       const targetId = this.getAttribute("href");
-  
+
       // 最初の文字 '#' を削除
       const cleanTargetId = targetId.slice(1);
 
       // '#' を削除したIDでターゲット要素を取得
       const targetElement = document.getElementById(cleanTargetId);
-  
+
       if (targetElement) {
         const headerOffset = 100; // 固定ヘッダーの高さに応じて調整
-        const elementPosition = targetElement.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.scrollY - headerOffset;
-  
+        const sidebarOffset = 300;
+        const elementRect = targetElement.getBoundingClientRect();
+        const elementPositionY = elementRect.top;
+        const elementPositionX = elementRect.left;
+
+        // y方向とx方向のスクロール位置を計算
+        const offsetPositionY =
+          elementPositionY + window.scrollY - headerOffset;
+        const offsetPositionX =
+          elementPositionX + window.scrollX - sidebarOffset;
+
+        // スクロール実行 (y方向とx方向を指定)
         window.scrollTo({
-          top: offsetPosition,
+          top: offsetPositionY,
+          left: offsetPositionX,
           behavior: "smooth", // スムーズなスクロール
         });
       } else {
@@ -706,7 +747,6 @@
       }
     });
   });
-  
 
   //カスタムスクロールバーのhover制御
   document.querySelectorAll(".scrollable-content").forEach((element) => {
@@ -754,7 +794,7 @@
     });
   }
 
-  if(document.getElementById("unapproved")){
+  if (document.getElementById("unapproved")) {
     // 初期状態では「参加フォーム」が表示され、「新規フォーム」は非表示にする
     document.getElementById("requests").style.display = "none";
     document.getElementById("unapproved").style.display = "block";
@@ -772,63 +812,155 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", function() {
+  document.addEventListener("DOMContentLoaded", function () {
     const checkBox = document.getElementById("approvalToggle");
-    if(checkBox){
-      checkBox.addEventListener("change", function() {
-          toggleHistory(this);
+    if (checkBox) {
+      checkBox.addEventListener("change", function () {
+        toggleHistory(this);
       });
     }
   });
   function toggleHistory(checkbox) {
     if (checkbox.checked) {
-        window.location.href = '/approval?log=true';
+      window.location.href = "/approval?log=true";
     } else {
-        window.location.href = '/approval?log=false';
+      window.location.href = "/approval?log=false";
     }
   }
 
   const userToggleButtons = document.querySelectorAll(".user-toggle");
-  if(userToggleButtons.length != 0){
-    userToggleButtons.forEach(button => {
-        button.addEventListener("click", function () {
-          const inputId = button.getAttribute("data-input-id");
-          const input = document.querySelector(`input[data-input-id='${inputId}']`);
-          const btn = document.querySelector(`[data-btn-id='${inputId}']`);
+  if (userToggleButtons.length != 0) {
+    userToggleButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const inputId = button.getAttribute("data-input-id");
+        const input = document.querySelector(
+          `input[data-input-id='${inputId}']`
+        );
+        const btn = document.querySelector(`[data-btn-id='${inputId}']`);
 
-          // 自分がすでに編集モードかどうかを確認
-          const isEditable = !input.disabled;
+        // 自分がすでに編集モードかどうかを確認
+        const isEditable = !input.disabled;
 
-          if (isEditable) {
-              // すでに編集モードなら解除する
-              input.classList.remove("form-control");
-              input.classList.add("form-control-plaintext");
-              input.disabled = true;
-              btn.hidden = true;
-          } else {
-              // 他の編集状態を解除
-              userToggleButtons.forEach(otherButton => {
-                  if (otherButton !== button) {
-                      const otherInputId = otherButton.getAttribute("data-input-id");
-                      const otherInput = document.querySelector(`input[data-input-id='${otherInputId}']`);
-                      const otherBtn = document.querySelector(`[data-btn-id='${otherInputId}']`);
+        if (isEditable) {
+          // すでに編集モードなら解除する
+          input.classList.remove("form-control");
+          input.classList.add("form-control-plaintext");
+          input.disabled = true;
+          btn.hidden = true;
+        } else {
+          // 他の編集状態を解除
+          userToggleButtons.forEach((otherButton) => {
+            if (otherButton !== button) {
+              const otherInputId = otherButton.getAttribute("data-input-id");
+              const otherInput = document.querySelector(
+                `input[data-input-id='${otherInputId}']`
+              );
+              const otherBtn = document.querySelector(
+                `[data-btn-id='${otherInputId}']`
+              );
 
-                      otherInput.classList.remove("form-control");
-                      otherInput.classList.add("form-control-plaintext");
-                      otherInput.disabled = true;
-                      otherBtn.hidden = true;
-                  }
-              });
+              otherInput.classList.remove("form-control");
+              otherInput.classList.add("form-control-plaintext");
+              otherInput.disabled = true;
+              otherBtn.hidden = true;
+            }
+          });
 
-              // 自分を編集可能にする
-              input.classList.remove("form-control-plaintext");
-              input.classList.add("form-control");
-              input.disabled = false;
-              btn.hidden = false;
-          }
-        });
+          // 自分を編集可能にする
+          input.classList.remove("form-control-plaintext");
+          input.classList.add("form-control");
+          input.disabled = false;
+          btn.hidden = false;
+        }
+      });
     });
   }
 
+  const containers = document.querySelectorAll(".border-start-container");
+  if (containers.length > 0) {
+    document.addEventListener("DOMContentLoaded", function () {
+      // 初回計算
+      recalculateBorders();
 
+      // collapseイベントが発生するたびに再計算
+      document.querySelectorAll(".collapse").forEach((collapseElement) => {
+        // アイコンを変更するために対応するトリガーを探す
+        const collapseId = collapseElement.id;
+        const triggerElement = document.querySelector(
+          `[aria-controls="${collapseId}"]`
+        );
+        const iconElement = triggerElement
+          ? triggerElement.querySelector("i")
+          : null;
+
+        collapseElement.addEventListener("shown.bs.collapse", function () {
+          recalculateBorders();
+          if (iconElement) {
+            iconElement.classList.remove("bi-plus-circle");
+            iconElement.classList.add("bi-dash-circle");
+          }
+        });
+
+        collapseElement.addEventListener("hidden.bs.collapse", function () {
+          recalculateBorders();
+          if (iconElement) {
+            iconElement.classList.remove("bi-dash-circle");
+            iconElement.classList.add("bi-plus-circle");
+          }
+        });
+      });
+    });
+  }
+
+  function recalculateBorders() {
+    if (containers) {
+      containers.forEach((container) => {
+        const cardTop = bfsQuerySelector(container, ".card-top");
+        const cardLast = bfsQuerySelector(container, ".card-last");
+        const borderStart = bfsQuerySelector(container, ".border-start");
+
+        if (cardTop && cardLast && borderStart) {
+          const rectTop = cardTop.getBoundingClientRect();
+          const rectLast = cardLast.getBoundingClientRect();
+
+          const startY = rectTop.top + window.scrollY;
+          const endY = rectLast.top + window.scrollY;
+
+          // 高さを計算し、`border-start`に適用
+          const height = endY - startY;
+          borderStart.style.height = `${height}px`;
+          borderStart.style.top = `1.6rem`;
+        }
+      });
+    }
+  }
+
+  function bfsQuerySelector(root, selector) {
+    const queue = [root]; // ルート要素をキューに追加
+
+    while (queue.length > 0) {
+      const element = queue.shift(); // キューから先頭の要素を取り出す
+
+      // セレクターに一致する要素をチェック
+      if (element.matches(selector)) {
+        return element;
+      }
+
+      // 子要素をすべてキューに追加
+      for (let i = 0; i < element.children.length; i++) {
+        queue.push(element.children[i]);
+      }
+    }
+
+    // 一致する要素が見つからなかった場合は null を返す
+    return null;
+  }
+
+  const disconnectTrigger = document.querySelector("#disconnect-trigger");
+  const disconnectForm = document.querySelector("#disconnect-form");
+  if (disconnectForm) {
+    disconnectTrigger.addEventListener("click", function () {
+      disconnectForm.submit();
+    });
+  }
 })();

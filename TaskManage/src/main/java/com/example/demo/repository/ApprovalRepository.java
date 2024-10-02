@@ -21,4 +21,10 @@ public interface ApprovalRepository extends JpaRepository<Approval, Integer>{
 	
     List<Approval> findAllByAssigneeAndAssigneeFlgAndProjectId(UserInfo assignee, boolean assigeneeFlg, String projectId);
     
+ 
+    void deleteAllByProjectIdAndApprover(String projectId, UserInfo approver);
+    
+    void deleteAllByProjectIdAndAssignee(String projectId, UserInfo assignee);
+    
+    List<Approval> findAllByTaskInAndProjectId(List<Task> tasks, String projectId);
 }

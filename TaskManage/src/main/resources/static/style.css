@@ -23,6 +23,15 @@ common
   left: 15px;
 }
 
+.py-07{
+  padding-top: 0.7rem!important;
+  padding-bottom: 0.7rem!important;
+}
+
+.mb-line{
+  margin-bottom: 1.9rem;
+}
+
 /* 
 navbar
  */
@@ -87,10 +96,12 @@ modal
 main
  */
 #main{
+  position: relative;
+  top: 56px;
   width: calc(100% - 250px);
   margin-left: 250px;
   transition: all 0.3s;
-  overflow: auto;
+  overflow-y: visible;
 }
 
 .toggle-sidebar #main{
@@ -227,3 +238,19 @@ btn
   --bs-btn-font-size: 0.8rem;
 }
 
+
+/* 
+overview
+*/
+.content-title{
+  font-weight: 500;
+}
+
+a.card:hover{
+  border-color: #697565;
+}
+
+.sticky-top{
+  top: calc(56px + 1rem);
+  z-index: 900;
+}

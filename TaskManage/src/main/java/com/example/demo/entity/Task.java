@@ -70,6 +70,10 @@ public class Task {
 	@Column(name = "completed_flg")
 	private boolean completedFlg;
 	
+	/** 接続フラグ */
+	@Column(name = "connect_flg")
+	private boolean connectFlg;
+	
 	/** 優先度 */
 	private byte priority;
 	

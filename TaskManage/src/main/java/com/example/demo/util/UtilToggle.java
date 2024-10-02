@@ -92,11 +92,36 @@ public class UtilToggle {
 		taskDao.save(task);
 		
 		var approval = approvalDao.findByTaskAndApproverFlg(task, true).get();
-		approvalDao.delete(approval);
+		approval.setApproverFlg(false);
+		approvalDao.save(approval);
 		
-		var countRecord = userProjectDao.findById(new UserProjectId(ownerId,task.getProjectId())).get();
-		countRecord.setUnapprovedCount(countRecord.getUnapprovedCount() - 1);
-		userProjectDao.save(countRecord);
+		var countRecordOpt = userProjectDao.findById(new UserProjectId(ownerId,task.getProjectId()));
+		if(countRecordOpt.isPresent()) {
+			var countRecord = countRecordOpt.get();
+			countRecord.setUnapprovedCount(countRecord.getUnapprovedCount() - 1);
+			userProjectDao.save(countRecord);
+		}
+	}
+	
+	
+	public void updateParentTaskOnCreate(Task task) {
+		var parentTask = taskDao.findById(task.getParentId()).get();
+		parentTask.setSubTotal(parentTask.getSubTotal()+1);
+		parentTask.setUpdatedAt(LocalDateTime.now());
+		if(parentTask.isSubmitFlg()) {
+			if(parentTask.isCompletedFlg()) {
+				var nextTask = taskDao.findById(parentTask.getTaskId()).get();
+				cancel(parentTask, nextTask.getAssignedUser().getUserId());
+			}else {
+				taskDao.save(parentTask);
+			}
+		}else {
+			if(parentTask.isCompletedFlg()) {
+				incomplete(parentTask);
+			}else {
+				taskDao.save(parentTask);
+			}
+		}
 	}
 
 }

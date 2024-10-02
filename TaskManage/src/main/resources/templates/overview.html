@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>MyTask</title>
+  </head>
+
+  <body>
+    <div th:insert="~{common/sourceList :: sourceList}"></div>
+    <div th:replace="~{common/header :: header}"></div>
+    <div th:insert="~{common/sidebar :: sidebar}"></div>
+    <div th:replace="~{common/taskOffcanvas :: taskOffcanvas}"></div>
+
+    <!-- 
+	
+	main
+	
+	-->
+    <main class="" id="main">
+      <div class="container-fluid">
+        <div th:replace="~{common/alert :: alert}"></div>
+        <div class="w-100 bg-white" style="height: 1rem; z-index: 997; position: fixed; top: 56px;"></div>
+        <div class="d-flex ps-2 py-3">
+          <a
+            type="button"
+            class="card rounded-5 d-inline-block sticky-top text-decoration-none project-info-btn mb-2"
+            style="height: 3rem; min-width: auto;"
+            data-bs-toggle="modal"
+            data-bs-target="#modal-project"
+            th:attr="
+                  data-name=${nowProjectInfo.name},
+                  data-description=${nowProjectInfo.description},
+                  data-first-task=${nowProjectInfo.firstTask},
+                  data-task-description=${nowProjectInfo.taskDescription},
+                  data-deadline=${nowProjectInfo.deadline}
+                "
+          >
+            <!-- class="card rounded-5 d-flex sticky-top text-nowrap" -->
+            <div class="card-body d-flex progress-background py-07">
+              <div class="progress rounded-5">
+                <div
+                  th:id="${rootTask.task.taskId}"
+                  class="progress-bar"
+                  role="progressbar"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  th:style="'width: ' + ${rootTask.progress} + '%;'"
+                  th:attr="aria-valuenow=${rootTask.progress}"
+                  th:classappend="${rootTask.isWarning ? 'bg-warning' : ''}"
+                ></div>
+              </div>
+              <div class="content mx-2">
+                <div
+                  class="content-title text-nowrap"
+                  th:text="${rootTask.task.title}"
+                ></div>
+              </div>
+              <div class="vr mx-2"></div>
+              <div
+                class="text-secondary text-nowrap px-2"
+                th:text="${memberMap[nowProjectInfo.leaderId]}"
+              ></div>
+            </div>
+          </a>
+          <div
+            class="border-bottom border-2 sticky-top mb-line"
+            style="height: 1.6rem; min-width: 1.6rem"
+          ></div>
+          <!--  -->
+          <div class="border-start-container position-relative">
+            <div class="border-start border-2 position-absolute"></div>
+            <th:block th:each="subTask, iterStat : ${rootTask.subTaskList}">
+              <div
+                th:replace="~{common/nestBody :: nestingTask(${subTask}, ${rootTask.task}, ${iterStat.first}, ${iterStat.last})}"
+              ></div>
+            </th:block>
+          </div>
+          <!--  -->
+          <div style="min-width: 100px; height: 1px;"></div>
+        </div>
+      </div>
+      <div class="w-100" style="height: 100px;"></div>
+    </main>
+
+    <script th:src="@{/main.js}"></script>
+  </body>
+</html>

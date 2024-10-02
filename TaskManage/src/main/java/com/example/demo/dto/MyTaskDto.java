@@ -2,6 +2,7 @@ package com.example.demo.dto;
 
 import java.util.List;
 
+import com.example.demo.domain.MyStatus;
 import com.example.demo.domain.NestingTaskDto;
 
 import lombok.Data;
@@ -13,5 +14,5 @@ public class MyTaskDto {
 	
 	private List<NestingTaskDto> parentTaskList;
 	
-	
+	private MyStatus status;
 }

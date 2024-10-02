@@ -5,12 +5,12 @@
       <!-- 
 			 削除確認モーダル
 			 -->
-			 <div
-       class="modal fade"
-       id="deleteTaskModal"
-       aria-hidden="true"
-       tabindex="-1"
-     >
+			<div
+        class="modal fade"
+        id="deleteTaskModal"
+        aria-hidden="true"
+        tabindex="-1"
+      >
        <div class="modal-dialog modal-dialog-centered">
          <div class="modal-content">
            <div class="modal-header">
@@ -32,6 +32,41 @@
              <button
                class="btn btn-secondary"
                data-bs-target="#deleteTaskModal"
+               data-bs-toggle="modal"
+             >
+               close
+             </button>
+           </div>
+         </div>
+       </div>
+     </div>
+			<div
+        class="modal fade"
+        id="disconnectModal"
+        aria-hidden="true"
+        tabindex="-1"
+      >
+       <div class="modal-dialog modal-dialog-centered">
+         <div class="modal-content">
+           <div class="modal-header">
+             <h1 class="modal-title fs-5">※注意</h1>
+           </div>
+           <div class="modal-body">
+             このタスクは現在のプロジェクトから切り離されます。
+           </div>
+           <div class="modal-footer d-flex justify-content-between">
+             
+             <button
+             type="button"
+             class="btn btn-danger"
+             id="disconnect-trigger"
+           >
+             切り離す
+           </button>
+             
+             <button
+               class="btn btn-secondary"
+               data-bs-target="#disconnectModal"
                data-bs-toggle="modal"
              >
                close
@@ -84,6 +119,7 @@
           <form
             class="row g-3"
             th:action="@{/task}"
+            id="task-update-form"
             method="post"
             th:object="${editTaskForm}"
           >
@@ -116,6 +152,7 @@
                 maxlength="300"
               ></textarea>
             </div>
+            <input type="text" id="form-connect-flg" value="" hidden>
             <div class="col-12">
               <label for="form-assigned-user" class="nav-heading">担当</label>
               <div class="input-group search-form">
@@ -191,7 +228,7 @@
                     disabled
                   />
                   <label class="form-check-label ms-2" for="form-priority2">
-                    <i class="bi bi-hourglass-split text-warning fs-4"></i>
+                    <i class="bi bi-fast-forward-fill text-info fs-4"></i>
                   </label>
                 </div>
                 <div class="form-check me-4 d-flex align-items-center">
@@ -205,7 +242,7 @@
                   />
                   <label class="form-check-label ms-2" for="form-priority3">
                     <i
-                      class="bi bi-exclamation-circle-fill text-primary fs-4"
+                      class="bi bi-star-fill text-warning fs-4"
                     ></i>
                   </label>
                 </div>
@@ -311,39 +348,63 @@
                 </button>
               </div>
             </div>
+          </form>
+          <div th:if="${uri == '/overview'}" id="connect-form" class="text-center my-3">
+            <form th:action="@{connectProject}" method="get">
+              <input type="text" name="taskId" id="connect-new-id" value="" hidden>
+              <input type="text" name="title" id="connect-new-title" value="" hidden>
+              <button class="btn btn-link text-secondary" name="connect" value="new">新規プロジェクトとして切り離す</button>
+            </form>
+            <form th:action="@{connectProject}" method="get">
+              <input type="text" name="taskId" id="connect-old-id" value="" hidden>
+              <input type="text" name="title" id="connect-old-title" value="" hidden>
+              <button class="btn btn-link text-secondary" name="connect" value="old">サブタスクに別プロジェクトを繋げる</button>
+            </form>
+          </div>
+          <div th:if="${uri == '/overview'}" id="disconnect-button" class="text-center my-3">
+            <button type="button" class="btn btn-link text-secondary" data-bs-toggle="modal" data-bs-target="#disconnectModal">
+              プロジェクトを切り離す
+            </button>
+          </div>
+            
 
-            <div class="col-12 nav-heading justify-content-end">
-              <div class="d-flex justify-content-end align-items-center">
-                <label class="me-2">作成日時</label>
-                <input
-                  type="datetime-local"
-                  class="form-control-plaintext w-32"
-                  id="form-created-at"
-                  disabled
-                />
-              </div>
-              <div class="d-flex justify-content-end align-items-center">
-                <label class="me-2">更新日時</label>
-                <input
-                  type="datetime-local"
-                  class="form-control-plaintext w-32"
-                  id="form-updated-at"
-                  disabled
-                />
-              </div>
-              <div
-                class="d-flex justify-content-end align-items-center d-none"
-                id="form-completed-at-div"
-              >
-                <label class="me-2">完了日時</label>
-                <input
-                  type="datetime-local"
-                  class="form-control-plaintext w-32"
-                  id="form-completed-at"
-                  disabled
-                />
-              </div>
+
+
+          <div class="col-12 nav-heading justify-content-end">
+            <div class="d-flex justify-content-end align-items-center">
+              <label class="me-2">作成日時</label>
+              <input
+                type="datetime-local"
+                class="form-control-plaintext w-32"
+                id="form-created-at"
+                disabled
+              />
             </div>
+            <div class="d-flex justify-content-end align-items-center">
+              <label class="me-2">更新日時</label>
+              <input
+                type="datetime-local"
+                class="form-control-plaintext w-32"
+                id="form-updated-at"
+                disabled
+              />
+            </div>
+            <div
+              class="d-flex justify-content-end align-items-center d-none"
+              id="form-completed-at-div"
+            >
+              <label class="me-2">完了日時</label>
+              <input
+                type="datetime-local"
+                class="form-control-plaintext w-32"
+                id="form-completed-at"
+                disabled
+              />
+            </div>
+          </div>
+          <form th:action="@{/project}" id="disconnect-form" method="post" hidden>
+            <input type="text" id="disconnect-task-id" name="taskId">
+            <input type="text" name="disconnect" value="">
           </form>
           <form th:action="@{/task}" method="post" hidden>
             <input type="text" id="hidden-form-task-id" name="taskId" />

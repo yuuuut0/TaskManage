@@ -29,4 +29,5 @@ public interface UserProjectRepository extends JpaRepository<UserProject, UserPr
     // 特定のプロジェクト内で handle が存在するかどうかを確認するメソッド
     boolean existsByProjectAndHandle(Project project, String handle);
     
+    List<UserProject> findAllByUserInfoInAndProject(List<UserInfo> users, Project project);
 }

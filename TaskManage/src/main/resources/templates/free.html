@@ -108,6 +108,7 @@
 														data-sub-total=${task.task.subTotal},
 														data-submit-flg=${task.task.submitFlg},
 														data-completed-flg=${task.task.completedFlg},
+                            data-connect-flg=${task.task.connectFlg},
 														data-parent-title=${task.parentTask != null ? task.parentTask.title : 'no parent task'},
                             data-owner-id=${task.parentTask?.assignedUser != null ? task.parentTask.assignedUser.userId : ''},
                             data-owner-name=${task.parentTask?.assignedUser != null ? task.parentTask.assignedUser.username : 'free'},

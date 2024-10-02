@@ -95,7 +95,7 @@
                   <div class="d-flex justify-content-between">
                     <h5
                       class="card-title"
-                      th:text="${approval.assignee.username}"
+                      th:text="${approval.assignee != null ? approval.assignee.username : 'null'}"
                     ></h5>
                     <a
                       type="button"
@@ -115,6 +115,7 @@
 														data-sub-total=${approval.task.subTotal},
 														data-submit-flg=${approval.task.submitFlg},
 														data-completed-flg=${approval.task.completedFlg},
+														data-connect-flg=${approval.task.connectFlg},
 														data-parent-title=${unapproved.title},
 														data-owner-id=${unapproved.ownerId},
 														data-owner-name=${unapproved.ownerName},
@@ -251,7 +252,7 @@
                   <div class="d-flex justify-content-between">
                     <h5
                       class="card-title"
-                      th:text="${approval.approver.username}"
+                      th:text="${approval.approver != null ? approval.approver.username : 'null'}"
                     ></h5>
                     <a
                       type="button"
@@ -271,6 +272,7 @@
 														data-sub-total=${approval.task.subTotal},
 														data-submit-flg=${approval.task.submitFlg},
 														data-completed-flg=${approval.task.completedFlg},
+														data-connect-flg=${approval.task.connectFlg},
 														data-parent-title=${requests.title},
 														data-owner-id=${requests.ownerId},
 														data-owner-name=${requests.ownerName},

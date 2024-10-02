@@ -12,6 +12,7 @@ import com.example.demo.form.EditProjectForm;
 import com.example.demo.form.JoinProjectForm;
 import com.example.demo.service.ProjectService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -68,8 +69,76 @@ public class ProjectController {
 		}
 	}
 	
+	
+	@PostMapping(params = "connectNew")
+	public String connectNew(@AuthenticationPrincipal User user, RedirectAttributes rs,
+			 String nowProjectId, String newProjectId, String projectCode, String name, String description, int taskId, String title) {
+		var userId = user.getUsername();
+		try {
+			var result = projectService.connectNew(userId, nowProjectId, newProjectId, projectCode, name, description, taskId);
+			if(result.isError()) {
+				rs.addFlashAttribute("newProjectId", newProjectId);
+				rs.addFlashAttribute("name", name);
+				rs.addFlashAttribute("description", description);
+				rs.addFlashAttribute("alert", result);
+				return "redirect:/connectProject?taskId="+taskId+"&title="+title+"&connect=new";
+			}else {
+				rs.addFlashAttribute("sidebarAlert", result);
+				return "redirect:/home";
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			rs.addFlashAttribute("error", e.getMessage());
+			return "redirect:/overview";
+		}
+	
+	}
+	
+	@PostMapping(params = "connectOld")
+	public String connectOld(@AuthenticationPrincipal User user, RedirectAttributes rs,
+			String projectId, String projectCode, int taskId, String title) {
+		var userId = user.getUsername();
+		try {
+			var result = projectService.connectOld(userId, projectId, projectCode, taskId);
+			if(result.isError()) {
+				rs.addFlashAttribute("projectId", projectId);
+				rs.addFlashAttribute("alert", result);
+				return "redirect:/connectProject?taskId="+taskId+"&title="+title+"&connect=old";
+			}else {
+				rs.addFlashAttribute("alert", result);
+				return "redirect:/overview";
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			rs.addFlashAttribute("error", e.getMessage());
+			return "redirect:/overview";
+		}
+		
+	}
+	
+	@PostMapping(params = "disconnect")
+	public String disconnect(@AuthenticationPrincipal User user, RedirectAttributes rs,
+			String projectId, String projectCode, int taskId) {
+		var userId = user.getUsername();
+		try {
+			var result = projectService.disconnect(userId, taskId);
+			if(result.isError()) {
+				rs.addFlashAttribute("alert", result);
+			}else {
+				rs.addFlashAttribute("alert", result);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			rs.addFlashAttribute("error", e.getMessage());
+		}
+		return "redirect:/overview";
+	}
+	
+	
+	
 	@PostMapping(params = "update")
-	public String update(@AuthenticationPrincipal User user, EditProjectForm editProjectForm, RedirectAttributes rs) {
+	public String update(@AuthenticationPrincipal User user, EditProjectForm editProjectForm, RedirectAttributes rs, HttpServletRequest request) {
+		String referer = request.getHeader("Referer");
 		var userId = user.getUsername();
 		try {
 			var result = projectService.update(userId, editProjectForm);
@@ -78,11 +147,17 @@ public class ProjectController {
 			e.printStackTrace();
 			rs.addFlashAttribute("error", e.getMessage());
 		}
-		return "redirect:/home";
+		
+		if(referer != null) {
+			return "redirect:" + referer;
+		}else {
+			return "redirect:home";
+		}
 	}
 	
 	@PostMapping(params = "updateCode")
-	public String updateCode(String projectId, String projectCode, RedirectAttributes rs) {
+	public String updateCode(String projectId, String projectCode, RedirectAttributes rs, HttpServletRequest request) {
+		String referer = request.getHeader("Referer");
 		try {
 			var result = projectService.updateCode(projectId, projectCode);
 			rs.addFlashAttribute("sidebarAlert", result);
@@ -90,7 +165,12 @@ public class ProjectController {
 			e.printStackTrace();
 			rs.addFlashAttribute("error", e.getMessage());
 		}
-		return "redirect:/home";
+		
+		if(referer != null) {
+			return "redirect:" + referer;
+		}else {
+			return "redirect:home";
+		}
 	}
 	
 	@PostMapping(params = "delete")

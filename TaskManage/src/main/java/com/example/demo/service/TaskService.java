@@ -66,11 +66,7 @@ public class TaskService {
 		task.setUpdatedAt(LocalDateTime.now());
 		taskDao.save(task);
 		
-		var parentTask = taskDao.findById(task.getParentId()).get();
-		parentTask.setCompletedFlg(false);
-		parentTask.setSubTotal(parentTask.getSubTotal()+1);
-		parentTask.setUpdatedAt(LocalDateTime.now());
-		taskDao.save(parentTask);
+		util.updateParentTaskOnCreate(task);
 		
 		return ResultMsg.EDIT_SUCCEED;
 	}
@@ -133,7 +129,7 @@ public class TaskService {
 		task.setAssignedUser(new UserInfo(userId));
 		task.setUpdatedAt(LocalDateTime.now());
 		if(task.isCompletedFlg() && task.isSubmitFlg()) {
-			task.setCompletedFlg(false);
+			return ResultMsg.UNKNOWN_ERROR;
 		}
 		taskDao.save(task);
 		

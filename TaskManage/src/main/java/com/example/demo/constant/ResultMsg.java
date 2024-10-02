@@ -16,7 +16,7 @@ public enum ResultMsg {
 	SIGNUP_FORM_ERROR("入力項目にエラーがあります", true),
 	
 	//プロジェクト関連authorized
-	NOT_AUTHORIZED("編集する権限がありません", true),
+	NOT_AUTHORIZED("このプロジェクトを編集する権限がありません", true),
 	EXISTED_PROJECT_ID("このprojectIDは使用されています", true),
 	NOT_EXISTED_PROJECT_ID("projectIDが存在しません", true),
 	JOIN_FAILED("IDとcodeの組み合わせが異なります", true),
@@ -25,6 +25,9 @@ public enum ResultMsg {
 	//承認関係
 	SUBMIT_SUCCEED("承認申請を出しました。", false),
 	SUBMIT_CANCEL("承認申請を取り消しました", false),
+	
+	//プロジェクト接続関連
+	CONNECT_ERROR_LOOP("タスク間でループが発生しないようにしてください", true),
 	
 	EDIT_SUCCEED("更新しました。", false),
 	UNKNOWN_ERROR("エラー", true);

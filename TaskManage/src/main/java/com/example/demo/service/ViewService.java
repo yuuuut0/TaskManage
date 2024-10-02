@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.FreeTask;
 import com.example.demo.domain.Member;
+import com.example.demo.domain.MyStatus;
 import com.example.demo.domain.NestingTaskDto;
 import com.example.demo.domain.ProjectInfo;
 import com.example.demo.domain.Requests;
@@ -18,6 +19,7 @@ import com.example.demo.dto.ApprovalDto;
 import com.example.demo.dto.BaseDto;
 import com.example.demo.dto.FreeDto;
 import com.example.demo.dto.MyTaskDto;
+import com.example.demo.dto.OverviewDto;
 import com.example.demo.entity.Approval;
 import com.example.demo.entity.Task;
 import com.example.demo.entity.UserProjectId;
@@ -118,7 +120,7 @@ public class ViewService {
 			var myTasks = taskDao.findAllByParentIdAndAssignedUser(parentTask.getTaskId(), baseDto.getUser());
 			var myTaskDtoList = new ArrayList<NestingTaskDto>();
 			for(Task myTask : myTasks) {
-				var TaskDto = joinSubTask(myTask, 0, 2);
+				var TaskDto = joinSubTask(myTask, 0, 2, baseDto.getNowProjectInfo().getProjectId());
 				myTaskDtoList.add(TaskDto);
 			}
 			var parentTaskDto = new NestingTaskDto();
@@ -126,8 +128,30 @@ public class ViewService {
 			parentTaskDto.setSubTaskList(myTaskDtoList);
 			parentTaskDtoList.add(parentTaskDto);
 		}
-		
 		myTaskDto.setParentTaskList(parentTaskDtoList);
+		
+		var myAllTasks = taskDao.findAllByProjectIdAndAssignedUser(baseDto.getNowProjectInfo().getProjectId(), baseDto.getUser());
+		int comp = 0, fake = 0;
+		for(Task task : myAllTasks) {
+			var compFlg = task.isCompletedFlg();
+			var submitFlg = task.isSubmitFlg();
+			var subComp = task.getSubCompleted();
+			var subTotal = task.getSubTotal();
+			if(compFlg) {
+				if(submitFlg || !(subTotal == subComp)) {
+					fake++;
+				}else {
+					comp++;
+				}
+			}else if(submitFlg) {
+				if(subTotal == subComp) {
+					fake++;
+				}
+			}
+		}
+		var total = myAllTasks.size();
+		var myStatus = new MyStatus(total, comp, fake, comp*100/total, fake*100/total);
+		myTaskDto.setStatus(myStatus);
 		
 		return myTaskDto;
 		
@@ -227,7 +251,26 @@ public class ViewService {
 		
 	}
 	
-	private NestingTaskDto joinSubTask(Task task, int depth, int limit){
+	public OverviewDto getOverviewDto(String userId) {
+		var overviewDto = new OverviewDto();
+		var baseDto = getBaseDto(userId);
+		overviewDto.setBaseDto(baseDto);
+		if(baseDto.getNowProjectInfo() == null) {
+			return overviewDto;
+		}
+		
+		var nowProject = projectDao.findById(baseDto.getUser().getProjectId()).get();
+		var rootTask = nowProject.getFirstTask();
+		
+		var rootTaskDto = joinSubTask(rootTask, 0, Integer.MAX_VALUE, nowProject.getProjectId());
+		
+		overviewDto.setRootTask(rootTaskDto);
+		
+		return overviewDto;
+	}
+	
+	
+	private NestingTaskDto joinSubTask(Task task, int depth, int limit, String nowProjectId){
 		
 		var nestingTask = new NestingTaskDto(); 
 		nestingTask.setTask(task);
@@ -236,11 +279,11 @@ public class ViewService {
 		mapper.map(addInfo, nestingTask);
 		
 		var subTaskDtoList = new ArrayList<NestingTaskDto>();
-		var subTaskList = taskDao.findAllByParentId(task.getTaskId());
+		var subTaskList = taskDao.findAllByParentIdAndProjectId(task.getTaskId(), nowProjectId);
 		
 		if(depth != limit && !subTaskList.isEmpty()) {
 			for(Task subTask : subTaskList) {
-				var nestingSubTask = joinSubTask(subTask, depth + 1, limit);
+				var nestingSubTask = joinSubTask(subTask, depth + 1, limit, nowProjectId);
 				if(nestingSubTask != null) {
 					subTaskDtoList.add(nestingSubTask);
 				}
