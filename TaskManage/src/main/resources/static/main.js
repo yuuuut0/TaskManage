@@ -283,10 +283,11 @@
               }
             }
           });
-
-        if (
-          offcanvasElement.querySelector("#form-connect-flg").value == "false"
-        ) {
+        
+        const connectFlg = offcanvasElement.querySelector("#form-connect-flg").value === "true";
+        const submitFlg = offcanvasElement.querySelector("#form-submit-flg").checked;
+        const completedFlg = offcanvasElement.querySelector("#form-completed-flg").checked;
+        if (!connectFlg && !(submitFlg && completedFlg)) {
           // select[class="edit"] の処理
           const selectElement = offcanvasElement.querySelector(
             'select[class~="edit"]'
@@ -462,6 +463,7 @@
         assignedUserId ? assignedUserId : "";
       taskEditForm.querySelector("#form-assigned-user-selected").textContent =
         assignedUserName;
+      taskEditForm.querySelector("#form-completed-flg").checked = completedFlg;
       taskEditForm.querySelector("#form-submit-flg").checked = submitFlg;
       taskEditForm.querySelector("#form-connect-flg").value = connectFlg;
       taskEditForm.querySelector("#form-deadline").value = deadline;
@@ -585,19 +587,21 @@
       }
 
       //プロジェクト接続済みの場合disconnect-buttonを表示
-      if (loginUserId == assignedUserId) {
-        if (connectFlg == "true") {
-          document.querySelector("#disconnect-button").className =
-            "text-center my-3";
-          document.querySelector("#connect-form").className = "d-none";
+      if(document.querySelector("#disconnect-button")){
+        if (loginUserId == assignedUserId) {
+          if (connectFlg == "true") {
+            document.querySelector("#disconnect-button").className =
+              "text-center my-3";
+            document.querySelector("#connect-form").className = "d-none";
+          } else {
+            document.querySelector("#disconnect-button").className = "d-none";
+            document.querySelector("#connect-form").className =
+              "text-center my-3";
+          }
         } else {
           document.querySelector("#disconnect-button").className = "d-none";
-          document.querySelector("#connect-form").className =
-            "text-center my-3";
+          document.querySelector("#connect-form").className = "d-none";
         }
-      } else {
-        document.querySelector("#disconnect-button").className = "d-none";
-        document.querySelector("#connect-form").className = "d-none";
       }
 
       // 担当者の項目を初期化

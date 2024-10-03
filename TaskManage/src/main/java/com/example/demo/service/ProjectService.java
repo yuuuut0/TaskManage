@@ -334,6 +334,7 @@ public class ProjectService {
 		
 		task.setParentId(null);
 		task.setProjectId(null);
+		task.setConnectFlg(false);
 		taskDao.save(task);
 		
 		return ResultMsg.EDIT_SUCCEED;

@@ -144,13 +144,18 @@ public class ViewService {
 					comp++;
 				}
 			}else if(submitFlg) {
-				if(subTotal == subComp) {
+				if(subTotal == subComp && subTotal != 0) {
 					fake++;
 				}
 			}
 		}
 		var total = myAllTasks.size();
-		var myStatus = new MyStatus(total, comp, fake, comp*100/total, fake*100/total);
+		int compRate = 0, fakeRate = 0;
+		if(total != 0) {
+			compRate = comp*100/total;
+			fakeRate = fake*100/total;
+		}
+		var myStatus = new MyStatus(total, comp, fake, compRate, fakeRate);
 		myTaskDto.setStatus(myStatus);
 		
 		return myTaskDto;

@@ -113,7 +113,9 @@ public class TaskService {
 			}
 		}
 		mapper.map(form, task);
-		if(form.getAssignedUserId().equals("")) {
+		if(form.getAssignedUserId() == null) {
+			task.setAssignedUser(new UserInfo(userId));
+		}else if(form.getAssignedUserId().equals("")) {
 			task.setAssignedUser(null);
 		}else {
 			task.setAssignedUser(new UserInfo(form.getAssignedUserId()));
