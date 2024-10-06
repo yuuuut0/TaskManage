@@ -203,7 +203,7 @@ progress
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 1px);
   z-index: 0;
   --bs-progress-border-radius: 0;
   opacity: 0.3;
@@ -246,9 +246,20 @@ overview
   font-weight: 500;
 }
 
-a.card:hover{
-  border-color: #697565;
+.my-card{
+  border-color: rgba(239, 108, 0, 0.3);
+  border-width: 2px !important;
 }
+
+.my-card:hover{
+  border-color: rgba(239, 108, 0, 0.6)!important;
+}
+
+a.card:hover{
+  border-color: rgba(var(--bs-border-color), 0.5);
+}
+
+
 
 .sticky-top{
   top: calc(56px + 1rem);

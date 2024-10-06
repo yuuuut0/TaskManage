@@ -26,6 +26,7 @@
           <a
             type="button"
             class="card rounded-5 d-inline-block sticky-top text-decoration-none project-info-btn mb-2"
+            th:classappend="${user.userId == nowProjectInfo.leaderId ? 'my-card' : ''}"
             style="height: 3rem; min-width: auto;"
             data-bs-toggle="modal"
             data-bs-target="#modal-project"

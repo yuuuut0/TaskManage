@@ -15,7 +15,8 @@
         data-bs-toggle="offcanvas"
         data-bs-target="#offcanvasScrolling"
         aria-controls="offcanvasScrolling"
-        th:classappend="${first && last ? 'card-top card-last' : (first ? 'card-top' : (last ? 'card-last' : ''))}"
+        th:classappend="${(user.userId == task.task.assignedUser?.userId ? 'my-card ' : '')
+          + (first && last ? 'card-top card-last' : (first ? 'card-top' : (last ? 'card-last' : '')))}"
         th:attr="
             data-task-id=${task.task.taskId},
             data-title=${task.task.title},
