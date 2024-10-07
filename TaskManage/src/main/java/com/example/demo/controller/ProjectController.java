@@ -117,11 +117,27 @@ public class ProjectController {
 	}
 	
 	@PostMapping(params = "disconnect")
-	public String disconnect(@AuthenticationPrincipal User user, RedirectAttributes rs,
-			String projectId, String projectCode, int taskId) {
+	public String disconnect(@AuthenticationPrincipal User user, RedirectAttributes rs, int taskId) {
 		var userId = user.getUsername();
 		try {
 			var result = projectService.disconnect(userId, taskId);
+			if(result.isError()) {
+				rs.addFlashAttribute("alert", result);
+			}else {
+				rs.addFlashAttribute("alert", result);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			rs.addFlashAttribute("error", e.getMessage());
+		}
+		return "redirect:/overview";
+	}
+	
+	@PostMapping(params = "merge")
+	public String merge(@AuthenticationPrincipal User user, RedirectAttributes rs, int taskId) {
+		var userId = user.getUsername();
+		try {
+			var result = projectService.merge(userId, taskId);
 			if(result.isError()) {
 				rs.addFlashAttribute("alert", result);
 			}else {

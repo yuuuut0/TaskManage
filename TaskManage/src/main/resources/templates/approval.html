@@ -79,12 +79,43 @@
         <div id="unapproved">
           <h5
             class="text-body-tertiary text-center pe-5 me-5 pt-3"
-            th:if="${unapprovedList.isEmpty}"
+            th:if="${unapprovedList.isEmpty()}"
           >
             現在、承認依頼はありません。
           </h5>
           <div class="mb-4" th:each="unapproved : ${unapprovedList}">
-            <h3 class="mb-3" th:text="${unapproved.title}"></h3>
+            <div class="d-flex align-items-center mb-3">
+              <h3 class="mb-0" th:text="${unapproved.task.title}"></h3>
+              <a
+                type="button"
+                class="task-info-btn ms-4 mt-1"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasScrolling"
+                aria-controls="offcanvasScrolling"
+                th:attr="
+                      data-task-id=${unapproved.task.taskId},
+                      data-title=${unapproved.task.title},
+                      data-description=${unapproved.task.description},
+                      data-assigned-user-id=${unapproved.task.assignedUser != null ? unapproved.task.assignedUser.userId : ''},
+                      data-assigned-user-name=${unapproved.task.assignedUser != null ? unapproved.task.assignedUser.username : 'free'},
+                      data-priority=${unapproved.task.priority},
+                      data-deadline=${unapproved.task.deadline},
+                      data-sub-completed=${unapproved.task.subCompleted},
+                      data-sub-total=${unapproved.task.subTotal},
+                      data-submit-flg=${unapproved.task.submitFlg},
+                      data-completed-flg=${unapproved.task.completedFlg},
+                      data-connect-flg=${unapproved.task.connectFlg},
+                      data-parent-title=${unapproved.title},
+                      data-owner-id=${unapproved.ownerId},
+                      data-owner-name=${unapproved.ownerName},
+                      data-created-at=${unapproved.task.createdAt},
+                      data-updated-at=${unapproved.task.updatedAt},
+                      data-completed-at=${unapproved.task.completedAt}
+                    "
+              >
+                <i class="bi bi-info-circle fs-5 text-body-tertiary"></i>
+              </a>
+            </div>
             <div class="d-flex overflow-x-auto ms-4">
               <div
                 class="card me-3"
@@ -92,45 +123,17 @@
                 th:each="approval : ${unapproved.approvalList}"
               >
                 <div class="card-body">
-                  <div class="d-flex justify-content-between">
-                    <h5
-                      class="card-title"
+                  <div class="d-flex align-items-center mb-2">
+                    <h6
+                      class="text-body-secondary mb-0"
+                      th:text="${approval.approver != null ? approval.approver.username : 'null'}"
+                    ></h6>
+                    <i class="bi bi-caret-left mx-3 text-secondary"></i>
+                    <h4
+                      class="mb-0"
                       th:text="${approval.assignee != null ? approval.assignee.username : 'null'}"
-                    ></h5>
-                    <a
-                      type="button"
-                      class="task-info-btn"
-                      data-bs-toggle="offcanvas"
-                      data-bs-target="#offcanvasScrolling"
-                      aria-controls="offcanvasScrolling"
-                      th:attr="
-														data-task-id=${approval.task.taskId},
-														data-title=${approval.task.title},
-														data-description=${approval.task.description},
-														data-assigned-user-id=${approval.task.assignedUser != null ? approval.task.assignedUser.userId : ''},
-														data-assigned-user-name=${approval.task.assignedUser != null ? approval.task.assignedUser.username : 'free'},
-														data-priority=${approval.task.priority},
-														data-deadline=${approval.task.deadline},
-														data-sub-completed=${approval.task.subCompleted},
-														data-sub-total=${approval.task.subTotal},
-														data-submit-flg=${approval.task.submitFlg},
-														data-completed-flg=${approval.task.completedFlg},
-														data-connect-flg=${approval.task.connectFlg},
-														data-parent-title=${unapproved.title},
-														data-owner-id=${unapproved.ownerId},
-														data-owner-name=${unapproved.ownerName},
-														data-created-at=${approval.task.createdAt},
-														data-updated-at=${approval.task.updatedAt},
-														data-completed-at=${approval.task.completedAt}
-													"
-                    >
-                      <i class="bi bi-info-circle text-body-tertiary"></i>
-                    </a>
+                    ></h4>
                   </div>
-                  <h6
-                    class="card-subtitle mb-2 text-body-secondary"
-                    th:text="${approval.task.title}"
-                  ></h6>
                   <div class="row mb-1">
                     <div class="col-sm-4">
                       <small class="text-body-secondary">締め切り</small>
@@ -138,7 +141,7 @@
                     <div class="col-sm-7">
                       <small
                         class="text-body-secondary"
-                        th:text="${approval.task.deadline != null ? #temporals.format(approval.task.deadline, 'M/d HH:mm') : ''}"
+                        th:text="${unapproved.task.deadline != null ? #temporals.format(unapproved.task.deadline, 'M/d HH:mm') : ''}"
                       ></small>
                     </div>
                   </div>
@@ -236,12 +239,43 @@
         <div id="requests">
           <h5
             class="text-body-tertiary text-center pe-5 me-5 pt-3"
-            th:if="${requestsList.isEmpty}"
+            th:if="${requestsList.isEmpty()}"
           >
             未読の申請結果はありません。
           </h5>
           <div class="mb-4" th:each="requests : ${requestsList}">
-            <h3 class="mb-3" th:text="${requests.title}"></h3>
+            <div class="d-flex align-items-center mb-3">
+              <h3 class="mb-0" th:text="${requests.task.title}"></h3>
+              <a
+                type="button"
+                class="task-info-btn ms-4 mt-1"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasScrolling"
+                aria-controls="offcanvasScrolling"
+                th:attr="
+                      data-task-id=${requests.task.taskId},
+                      data-title=${requests.task.title},
+                      data-description=${requests.task.description},
+                      data-assigned-user-id=${requests.task.assignedUser != null ? requests.task.assignedUser.userId : ''},
+                      data-assigned-user-name=${requests.task.assignedUser != null ? requests.task.assignedUser.username : 'free'},
+                      data-priority=${requests.task.priority},
+                      data-deadline=${requests.task.deadline},
+                      data-sub-completed=${requests.task.subCompleted},
+                      data-sub-total=${requests.task.subTotal},
+                      data-submit-flg=${requests.task.submitFlg},
+                      data-completed-flg=${requests.task.completedFlg},
+                      data-connect-flg=${requests.task.connectFlg},
+                      data-parent-title=${requests.title},
+                      data-owner-id=${requests.ownerId},
+                      data-owner-name=${requests.ownerName},
+                      data-created-at=${requests.task.createdAt},
+                      data-updated-at=${requests.task.updatedAt},
+                      data-completed-at=${requests.task.completedAt}
+                    "
+              >
+                <i class="bi bi-info-circle fs-5 text-body-tertiary"></i>
+              </a>
+            </div>
             <div class="d-flex overflow-x-auto ms-4">
               <div
                 class="card me-3"
@@ -249,45 +283,17 @@
                 th:each="approval : ${requests.approvalList}"
               >
                 <div class="card-body">
-                  <div class="d-flex justify-content-between">
-                    <h5
-                      class="card-title"
+                  <div class="d-flex align-items-center mb-2">
+                    <h4
+                      class="mb-0"
                       th:text="${approval.approver != null ? approval.approver.username : 'null'}"
-                    ></h5>
-                    <a
-                      type="button"
-                      class="task-info-btn"
-                      data-bs-toggle="offcanvas"
-                      data-bs-target="#offcanvasScrolling"
-                      aria-controls="offcanvasScrolling"
-                      th:attr="
-														data-task-id=${approval.task.taskId},
-														data-title=${approval.task.title},
-														data-description=${approval.task.description},
-                            data-assigned-user-id=${approval.task.assignedUser != null ? approval.task.assignedUser.userId : ''},
-														data-assigned-user-name=${approval.task.assignedUser != null ? approval.task.assignedUser.username : 'free'},
-														data-priority=${approval.task.priority},
-														data-deadline=${approval.task.deadline},
-														data-sub-completed=${approval.task.subCompleted},
-														data-sub-total=${approval.task.subTotal},
-														data-submit-flg=${approval.task.submitFlg},
-														data-completed-flg=${approval.task.completedFlg},
-														data-connect-flg=${approval.task.connectFlg},
-														data-parent-title=${requests.title},
-														data-owner-id=${requests.ownerId},
-														data-owner-name=${requests.ownerName},
-														data-created-at=${approval.task.createdAt},
-														data-updated-at=${approval.task.updatedAt},
-														data-completed-at=${approval.task.completedAt}
-													"
-                    >
-                      <i class="bi bi-info-circle text-body-tertiary"></i>
-                    </a>
+                    ></h4>
+                    <i class="bi bi-caret-right mx-3 text-secondary"></i>
+                    <h6
+                      class="mb-0 text-body-secondary"
+                      th:text="${approval.assignee != null ? approval.assignee.username : 'null'}"
+                    ></h6>
                   </div>
-                  <h6
-                    class="card-subtitle mb-2 text-body-secondary"
-                    th:text="${approval.task.title}"
-                  ></h6>
                   <div class="row mb-1">
                     <div class="col-sm-4">
                       <small class="text-body-secondary">締め切り</small>
@@ -295,7 +301,7 @@
                     <div class="col-sm-7">
                       <small
                         class="text-body-secondary"
-                        th:text="${approval.task.deadline != null ? #temporals.format(approval.task.deadline, 'M/d HH:mm') : ''}"
+                        th:text="${requests.task.deadline != null ? #temporals.format(requests.task.deadline, 'M/d HH:mm') : ''}"
                       ></small>
                     </div>
                   </div>

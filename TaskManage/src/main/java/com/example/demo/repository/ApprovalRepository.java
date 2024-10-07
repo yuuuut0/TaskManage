@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.example.demo.entity.Approval;
 import com.example.demo.entity.Task;
@@ -21,10 +23,29 @@ public interface ApprovalRepository extends JpaRepository<Approval, Integer>{
 	
     List<Approval> findAllByAssigneeAndAssigneeFlgAndProjectId(UserInfo assignee, boolean assigeneeFlg, String projectId);
     
- 
+    List<Approval> findAllByProjectId(String projectId);
+    
     void deleteAllByProjectIdAndApprover(String projectId, UserInfo approver);
     
     void deleteAllByProjectIdAndAssignee(String projectId, UserInfo assignee);
     
     List<Approval> findAllByTaskInAndProjectId(List<Task> tasks, String projectId);
+    
+    @Query("SELECT a FROM Approval a "
+    	     + "JOIN a.task t "
+    	     + "WHERE t.assignedUser.userId = :userId "
+    	     + "AND t.projectId = :projectId "
+    	     + "AND a.approverFlg = false "
+    	     + "AND a.assigneeFlg = false")
+    List<Approval> findAllByTaskAssignedUserAndProjectIdAndFlags(@Param("userId") String userId, @Param("projectId") String projectId);
+    
+    @Query("SELECT a FROM Approval a "
+    	     + "JOIN a.task t "
+    	     + "JOIN Task pt ON t.parentId = pt.taskId "
+    	     + "WHERE pt.assignedUser.userId = :userId "
+    	     + "AND pt.projectId = :projectId "
+    	     + "AND a.approverFlg = false")
+    List<Approval> findAllByParentTaskAssignedUserAndProjectIdAndFlag(@Param("userId") String userId, @Param("projectId") String projectId);
+
+
 }

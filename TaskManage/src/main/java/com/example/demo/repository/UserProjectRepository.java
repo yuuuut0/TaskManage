@@ -30,4 +30,6 @@ public interface UserProjectRepository extends JpaRepository<UserProject, UserPr
     boolean existsByProjectAndHandle(Project project, String handle);
     
     List<UserProject> findAllByUserInfoInAndProject(List<UserInfo> users, Project project);
+
+	List<UserProject> findAllByProject(Project project);
 }

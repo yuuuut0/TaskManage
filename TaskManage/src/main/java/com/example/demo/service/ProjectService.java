@@ -340,4 +340,82 @@ public class ProjectService {
 		return ResultMsg.EDIT_SUCCEED;
 	}
 	
+	@Transactional
+	public ResultMsg merge(String userId, int taskId) {
+		var task = taskDao.findById(taskId).get();
+		if(!task.getAssignedUser().getUserId().equals(userId)) {
+			return ResultMsg.UNKNOWN_ERROR;
+		}
+		
+		task.setConnectFlg(false);
+		taskDao.save(task);
+		
+		var nowProjectId = task.getProjectId(); 
+		var nowProject = projectDao.findById(nowProjectId).get();
+		var deleteProject = projectDao.findByFirstTask(task).get();
+		
+		var nowUserProjects = userProjectDao.findAllByProject(nowProject);
+		var deleteUserProjects = userProjectDao.findAllByProject(deleteProject);
+		var userProjectMap = new HashMap<String, UserProject>();
+		for(UserProject up : nowUserProjects) {
+			userProjectMap.put(up.getUserInfo().getUserId(), up);
+		}
+		for(UserProject up : deleteUserProjects) {
+			var upUserId = up.getUserInfo().getUserId();
+			UserProject newUp;
+			if(userProjectMap.containsKey(upUserId)) {
+				newUp = userProjectMap.get(upUserId);
+				newUp.setUnapprovedCount(newUp.getUnapprovedCount() + up.getUnapprovedCount());
+				newUp.setRequestsCount(newUp.getRequestsCount() + up.getRequestsCount());
+			}else {
+				newUp = new UserProject();
+				newUp.setUserInfo(up.getUserInfo());
+				newUp.setProject(new Project(nowProjectId));
+				var handle = up.getHandle();
+				var count = 1;
+				while(userProjectDao.existsByProjectAndHandle(nowProject, handle)) {
+					if(handle.length() >= 4) {
+						handle = count + "?";
+						count++;
+					}else {
+						handle = handle + "?";
+					}
+				}
+				newUp.setHandle(handle);
+			}
+			userProjectMap.put(upUserId, newUp);
+		}
+		userProjectDao.saveAll(userProjectMap.values());
+		userProjectDao.deleteAll(deleteUserProjects);
+		
+		
+		var approvals = approvalDao.findAllByProjectId(deleteProject.getProjectId());
+		for(Approval approval : approvals) {
+			approval.setProjectId(nowProjectId);
+		}
+		if(!approvals.isEmpty()) {
+			approvals= approvalDao.saveAll(approvals);
+		}
+		
+		var tasks = taskDao.findAllByProjectId(deleteProject.getProjectId());
+		for(Task t : tasks) {
+			t.setProjectId(nowProjectId);
+		}
+		if(!tasks.isEmpty()) {
+			taskDao.saveAll(tasks);
+		}
+		
+		var nullTask = new Task();
+		nullTask.setTitle("empty");
+		nullTask.setCreatedAt(LocalDateTime.now());
+		nullTask.setUpdatedAt(LocalDateTime.now());
+		nullTask = taskDao.save(nullTask);
+		
+		deleteProject.setFirstTask(nullTask);
+		deleteProject = projectDao.save(deleteProject);
+		taskDao.delete(nullTask);
+		
+		return ResultMsg.EDIT_SUCCEED;
+	}
+	
 }

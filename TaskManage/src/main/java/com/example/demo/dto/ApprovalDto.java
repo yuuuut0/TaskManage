@@ -1,9 +1,8 @@
 package com.example.demo.dto;
 
-import java.util.List;
+import java.util.Collection;
 
-import com.example.demo.domain.Requests;
-import com.example.demo.domain.Unapproved;
+import com.example.demo.domain.ApprovalRecord;
 
 import lombok.Data;
 
@@ -12,8 +11,8 @@ public class ApprovalDto {
 
 	private BaseDto baseDto;
 	
-	private List<Unapproved> unapprovedList;
+	private Collection<ApprovalRecord> unapprovedList;
 	
-	private List<Requests> requestsList;
+	private Collection<ApprovalRecord> requestsList;
 
 }

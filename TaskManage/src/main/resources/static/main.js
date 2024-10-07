@@ -283,10 +283,14 @@
               }
             }
           });
-        
-        const connectFlg = offcanvasElement.querySelector("#form-connect-flg").value === "true";
-        const submitFlg = offcanvasElement.querySelector("#form-submit-flg").checked;
-        const completedFlg = offcanvasElement.querySelector("#form-completed-flg").checked;
+
+        const connectFlg =
+          offcanvasElement.querySelector("#form-connect-flg").value === "true";
+        const submitFlg =
+          offcanvasElement.querySelector("#form-submit-flg").checked;
+        const completedFlg = offcanvasElement.querySelector(
+          "#form-completed-flg"
+        ).checked;
         if (!connectFlg && !(submitFlg && completedFlg)) {
           // select[class="edit"] の処理
           const selectElement = offcanvasElement.querySelector(
@@ -587,11 +591,11 @@
       }
 
       //プロジェクト接続済みの場合disconnect-buttonを表示
-      if(document.querySelector("#disconnect-button")){
+      if (document.querySelector("#disconnect-button")) {
         if (loginUserId == assignedUserId) {
           if (connectFlg == "true") {
             document.querySelector("#disconnect-button").className =
-              "text-center my-3";
+              "text-center my-3 d-flex flex-column";
             document.querySelector("#connect-form").className = "d-none";
           } else {
             document.querySelector("#disconnect-button").className = "d-none";
@@ -963,7 +967,27 @@
   const disconnectTrigger = document.querySelector("#disconnect-trigger");
   const disconnectForm = document.querySelector("#disconnect-form");
   if (disconnectForm) {
+    // モーダルが表示される前にトリガーされるイベント
+    const modalElement = document.getElementById("disconnectModal");
+    modalElement.addEventListener("show.bs.modal", function (event) {
+      // ボタンのvalueを取得
+      const button = event.relatedTarget; // モーダルを開いたボタン
+      const buttonValue = button.value; // ボタンのvalue属性
+      const modalBody = modalElement.querySelector(".modal-body");
+      if(buttonValue == "disconnect"){
+        // モーダルの内容を変更
+        modalBody.textContent = "このタスクは現在のプロジェクトから切り離されます。";
+        disconnectTrigger.innerText = "切り離す";
+        disconnectTrigger.value = buttonValue;
+      }else{
+        modalBody.textContent = "統合されたプロジェクトは削除されます";
+        disconnectTrigger.innerText = "統合する";
+        disconnectTrigger.value = buttonValue;
+      }
+    });
     disconnectTrigger.addEventListener("click", function () {
+      const value = this.value;
+      document.getElementById("disconnect-form-params").name = value;
       disconnectForm.submit();
     });
   }

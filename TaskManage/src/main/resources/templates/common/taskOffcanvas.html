@@ -362,9 +362,12 @@
               <button class="btn btn-link text-secondary" name="connect" value="old">サブタスクに別プロジェクトを繋げる</button>
             </form>
           </div>
-          <div th:if="${uri == '/overview'}" id="disconnect-button" class="text-center my-3">
-            <button type="button" class="btn btn-link text-secondary" data-bs-toggle="modal" data-bs-target="#disconnectModal">
+          <div th:if="${uri == '/overview'}" id="disconnect-button" class="text-center my-3 d-flex flex-column">
+            <button type="button" class="btn btn-link text-secondary" data-bs-toggle="modal" data-bs-target="#disconnectModal" value="disconnect">
               プロジェクトを切り離す
+            </button>
+            <button type="button" class="btn btn-link text-secondary" data-bs-toggle="modal" data-bs-target="#disconnectModal" value="merge">
+              プロジェクトを結合する
             </button>
           </div>
             
@@ -405,7 +408,7 @@
           </div>
           <form th:action="@{/project}" id="disconnect-form" method="post" hidden>
             <input type="text" id="disconnect-task-id" name="taskId">
-            <input type="text" name="disconnect" value="">
+            <input type="text" id="disconnect-form-params" name="" value="">
           </form>
           <form th:action="@{/task}" method="post" hidden>
             <input type="text" id="hidden-form-task-id" name="taskId" />

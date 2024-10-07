@@ -1,20 +1,22 @@
 package com.example.demo.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.domain.ApprovalInfo;
+import com.example.demo.domain.ApprovalRecord;
 import com.example.demo.domain.FreeTask;
 import com.example.demo.domain.Member;
 import com.example.demo.domain.MyStatus;
 import com.example.demo.domain.NestingTaskDto;
 import com.example.demo.domain.ProjectInfo;
-import com.example.demo.domain.Requests;
 import com.example.demo.domain.TaskAddInfo;
-import com.example.demo.domain.Unapproved;
 import com.example.demo.dto.ApprovalDto;
 import com.example.demo.dto.BaseDto;
 import com.example.demo.dto.FreeDto;
@@ -173,59 +175,58 @@ public class ViewService {
 			return approvalDto;
 		}
 		
-		
 		var projectId = baseDto.getNowProjectInfo().getProjectId();
 		List<Approval> approverList, assigneeList;
 		
-		
-		
-		approverList = approvalDao.findAllByApproverAndApproverFlgAndProjectId(baseDto.getUser(), !log, projectId);
-		assigneeList = approvalDao.findAllByAssigneeAndAssigneeFlgAndProjectId(baseDto.getUser(), !log, projectId);
-		
-		
-		var taskList = new HashMap<Integer, List<Approval>>();
-		for(Approval approval : approverList) {
-			var parentId = approval.getTask().getParentId();
-			taskList.computeIfAbsent(parentId, k -> new ArrayList<>()).add(approval);
+		if(log) {
+			approverList = approvalDao.findAllByParentTaskAssignedUserAndProjectIdAndFlag(userId, projectId);
+			assigneeList = approvalDao.findAllByTaskAssignedUserAndProjectIdAndFlags(userId, projectId);
+			
+		}else {
+			approverList = approvalDao.findAllByApproverAndApproverFlgAndProjectId(baseDto.getUser(), true, projectId);
+			assigneeList = approvalDao.findAllByAssigneeAndAssigneeFlgAndProjectId(baseDto.getUser(), true, projectId);
 		}
-		var unapprovedList = new ArrayList<Unapproved>();
-		if(!taskList.isEmpty()) {
-			var parentTasks = taskDao.findAllById(taskList.keySet());
-			for(Task task : parentTasks) {
-				var unapproved = new Unapproved();
-				unapproved.setParentTaskId(task.getTaskId());
-				unapproved.setTitle(task.getTitle());
-				unapproved.setOwnerId(task.getAssignedUser().getUserId());
-				unapproved.setOwnerName(task.getAssignedUser().getUsername());
-				unapproved.setApprovalList(taskList.get(task.getTaskId()));
-				unapprovedList.add(unapproved);
-			}
-		}
-		approvalDto.setUnapprovedList(unapprovedList);		
-		
-		taskList = new HashMap<Integer, List<Approval>>();
-		for(Approval approval : assigneeList) {
-			var parentId = approval.getTask().getParentId();
-			taskList.computeIfAbsent(parentId, k -> new ArrayList<>()).add(approval);
-		}
-		var requestsList = new ArrayList<Requests>();
-		if(!taskList.isEmpty()) {
-			var parentTasks = taskDao.findAllById(taskList.keySet());
-			for(Task task : parentTasks) {
-				var requests = new Requests();
-				requests.setParentTaskId(task.getTaskId());
-				requests.setTitle(task.getTitle());
-				requests.setOwnerId(task.getAssignedUser().getUserId());
-				requests.setOwnerName(task.getAssignedUser().getUsername());
-				requests.setApprovalList(taskList.get(task.getTaskId()));
-				requestsList.add(requests);
-			}
-		}
-		approvalDto.setRequestsList(requestsList);	
+		var unapprovedList = mapToApprovalRecords(approverList);
+		approvalDto.setUnapprovedList(unapprovedList);
+		var requestsList = mapToApprovalRecords(assigneeList);
+		approvalDto.setRequestsList(requestsList);
 		
 		return approvalDto;
 		
 	}
+	
+	private Collection<ApprovalRecord> mapToApprovalRecords(List<Approval> approvals) {
+		var taskMap = new HashMap<Integer, ApprovalRecord>();
+		var parentIds = new HashSet<Integer>();
+		var parentTaskMap = new HashMap<Integer, Task>();
+		for(Approval approval : approvals) {
+			var approvalInfo = mapper.map(approval, ApprovalInfo.class);
+			var taskId = approval.getTask().getTaskId();
+			if(!taskMap.containsKey(taskId)) {
+				var approvalRecord = new ApprovalRecord();
+				approvalRecord.setTask(approval.getTask());
+				approvalRecord.setApprovalList(new ArrayList<ApprovalInfo>());
+				taskMap.put(taskId, approvalRecord);
+				parentIds.add(approval.getTask().getParentId());
+			}
+			taskMap.get(taskId).getApprovalList().add(approvalInfo);
+		}
+		if(!taskMap.isEmpty()) {
+			var parentTasks = taskDao.findAllById(parentIds);
+			for(Task task : parentTasks) {
+				parentTaskMap.put(task.getTaskId(), task);
+			}
+		}
+		for(ApprovalRecord record : taskMap.values()) {
+			var parentTask = parentTaskMap.get(record.getTask().getParentId());
+			record.setOwnerId(parentTask.getAssignedUser().getUserId());
+			record.setOwnerName(parentTask.getAssignedUser().getUsername());
+			record.setTitle(parentTask.getTitle());
+		}
+		return taskMap.values();
+	}
+	
+	
 	
 	public FreeDto getFreeDto(String userId) {
 		var freeDto = new FreeDto();
