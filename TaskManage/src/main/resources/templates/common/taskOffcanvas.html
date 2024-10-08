@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <div th:fragment="taskOffcanvas">
+      <!-- 
+			 削除確認モーダル
+			 -->
+			<div
+        class="modal fade"
+        id="deleteTaskModal"
+        aria-hidden="true"
+        tabindex="-1"
+      >
+       <div class="modal-dialog modal-dialog-centered">
+         <div class="modal-content">
+           <div class="modal-header">
+             <h1 class="modal-title fs-5">※注意</h1>
+           </div>
+           <div class="modal-body">
+             タスクを削除すると、関連する下位タスクもすべて削除されます。
+           </div>
+           <div class="modal-footer d-flex justify-content-between">
+             
+             <button
+             type="button"
+             class="btn btn-danger hidden-form-trigger"
+             value="delete"
+           >
+             削除
+           </button>
+             
+             <button
+               class="btn btn-secondary"
+               data-bs-target="#deleteTaskModal"
+               data-bs-toggle="modal"
+             >
+               close
+             </button>
+           </div>
+         </div>
+       </div>
+     </div>
+			<div
+        class="modal fade"
+        id="disconnectModal"
+        aria-hidden="true"
+        tabindex="-1"
+      >
+       <div class="modal-dialog modal-dialog-centered">
+         <div class="modal-content">
+           <div class="modal-header">
+             <h1 class="modal-title fs-5">※注意</h1>
+           </div>
+           <div class="modal-body">
+             このタスクは現在のプロジェクトから切り離されます。
+           </div>
+           <div class="modal-footer d-flex justify-content-between">
+             
+             <button
+             type="button"
+             class="btn btn-danger"
+             id="disconnect-trigger"
+           >
+             切り離す
+           </button>
+             
+             <button
+               class="btn btn-secondary"
+               data-bs-target="#disconnectModal"
+               data-bs-toggle="modal"
+             >
+               close
+             </button>
+           </div>
+         </div>
+       </div>
+     </div>
+      <!-- 
+      削除確認モーダルebd
+      -->
+      <div
+        class="offcanvas offcanvas-end"
+        data-bs-scroll="true"
+        data-bs-backdrop="false"
+        tabindex="-1"
+        id="offcanvasScrolling"
+        aria-labelledby="offcanvasScrollingLabel"
+      >
+        <div class="offcanvas-header">
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">
+              タスク詳細
+            </h5>
+            <button
+              type="button"
+              class="btn me-2"
+              id="edit-trigger"
+              data-bs-toggle="button"
+            >
+              <i class="bi bi-pencil-square text-secondary"></i>
+            </button>
+          </div>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="offcanvas-body">
+          <div
+            class="alert d-flex align-items-center"
+            role="alert"
+            id="taskEdit-alert"
+          >
+            <i class="bi me-2" id="taskEdit-alert-icon"></i>
+            <div id="taskEdit-alert-message"></div>
+          </div>
+          <form
+            class="row g-3"
+            th:action="@{/task}"
+            id="task-update-form"
+            method="post"
+            th:object="${editTaskForm}"
+          >
+            <div hidden>
+              <input type="text" id="form-task-id" name="taskId" />
+            </div>
+
+            <div class="col-12">
+              <label for="form-title" class="nav-heading">task</label>
+              <input
+                type="text"
+                class="form-control-plaintext edit"
+                id="form-title"
+                name="title"
+                disabled
+                required
+                maxlength="50"
+              />
+            </div>
+            <div class="col-12">
+              <label for="form-description" class="nav-heading"
+                >description</label
+              >
+              <textarea
+                class="form-control-plaintext edit"
+                id="form-description"
+                name="description"
+                rows="3"
+                disabled
+                maxlength="300"
+              ></textarea>
+            </div>
+            <input type="text" id="form-connect-flg" value="" hidden>
+            <div class="col-12">
+              <label for="form-assigned-user" class="nav-heading">担当</label>
+              <div class="input-group search-form">
+                <select
+                  class="form-control-plaintext search-select edit"
+                  name="assignedUserId"
+                  id="form-assigned-user"
+                  disabled
+                >
+                  <option
+                    id="form-assigned-user-selected"
+                    value=""
+                    selected
+                  ></option>
+                  <option value="">free</option>
+                  <option
+                    th:each="member : ${memberMap}"
+                    th:value="${member.key}"
+                    th:text="${member.value}"
+                  ></option>
+                </select>
+                <input
+                  class="form-control search-input"
+                  type="text"
+                  placeholder="all"
+                  hidden
+                />
+                <button
+                  class="btn btn-outline-primary btn-sm search-button"
+                  type="button"
+                  hidden
+                >
+                  検索
+                </button>
+              </div>
+            </div>
+            <input type="checkbox" id="form-completed-flg" hidden>
+            <div class="col-12" id="form-check" hidden>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="submitFlg"
+                  id="form-submit-flg"
+                />
+                <label class="form-check-label" for="form-submit-flg">
+                  提出を求める
+                </label>
+              </div>
+            </div>
+            <div class="col-12">
+              <span class="nav-heading">優先度</span>
+              <div class="d-flex align-items-center">
+                <div class="form-check me-4 d-flex align-items-center">
+                  <input
+                    class="form-check-input edit"
+                    type="radio"
+                    name="priority"
+                    id="form-priority1"
+                    value="1"
+                    disabled
+                  />
+                  <label class="form-check-label ms-2" for="form-priority1"
+                    >なし</label
+                  >
+                </div>
+                <div class="form-check me-4 d-flex align-items-center">
+                  <input
+                    class="form-check-input edit"
+                    type="radio"
+                    name="priority"
+                    id="form-priority2"
+                    value="2"
+                    disabled
+                  />
+                  <label class="form-check-label ms-2" for="form-priority2">
+                    <i class="bi bi-fast-forward-fill text-info fs-4"></i>
+                  </label>
+                </div>
+                <div class="form-check me-4 d-flex align-items-center">
+                  <input
+                    class="form-check-input edit"
+                    type="radio"
+                    name="priority"
+                    id="form-priority3"
+                    value="3"
+                    disabled
+                  />
+                  <label class="form-check-label ms-2" for="form-priority3">
+                    <i
+                      class="bi bi-star-fill text-warning fs-4"
+                    ></i>
+                  </label>
+                </div>
+                <div class="form-check me-4 d-flex align-items-center">
+                  <input
+                    class="form-check-input edit"
+                    type="radio"
+                    name="priority"
+                    id="form-priority4"
+                    value="4"
+                    checked
+                  />
+                  <label class="form-check-label ms-2" for="form-priority4">
+                    <i
+                      class="bi bi-exclamation-triangle-fill text-danger fs-4"
+                    ></i>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <label for="form-deadline" class="nav-heading">締切</label>
+              <input
+                type="datetime-local"
+                class="form-control-plaintext edit"
+                id="form-deadline"
+                name="deadline"
+                disabled
+              />
+            </div>
+            <div class="col-12">
+              <label class="nav-heading">sub 達成度</label>
+              <div class="d-flex align-items-center">
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="form-sub-completed"
+                  disabled
+                />
+                <span class="mx-3">/</span>
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="form-sub-total"
+                  disabled
+                />
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="nav-heading">parent task</label>
+              <input
+                type="text"
+                class="form-control-plaintext"
+                id="form-parent-title"
+                disabled
+              />
+            </div>
+            <input type="text" id="form-owner-id" name="ownerId" value="" hidden/>
+            <div class="col-12">
+              <label class="nav-heading">責任者</label>
+              <input
+                type="text"
+                class="form-control-plaintext"
+                id="form-owner-name"
+                disabled
+              />
+            </div>
+            <div class="col-12">
+              <label for="form-comment" class="nav-heading">comment</label>
+              <textarea
+                class="form-control"
+                id="form-comment"
+                name="comment"
+                rows="3"
+                maxlength="80"
+              ></textarea>
+            </div>
+            <div class="col-12">
+              <button
+                type="button"
+                class="btn btn-success hidden-form-trigger"
+                id="completeButton"
+                value="complete"
+              >
+                完了
+              </button>
+              <div
+                class="d-none justify-content-between w-100"
+                id="formActions"
+              >
+                <button type="submit" class="btn btn-secondary" name="update">
+                  更新
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  data-bs-target="#deleteTaskModal"
+                  data-bs-toggle="modal"
+                  name=""
+                  hidden
+                >
+                  削除
+                </button>
+              </div>
+            </div>
+          </form>
+          <div th:if="${uri == '/overview'}" id="connect-form" class="text-center my-3">
+            <form th:action="@{connectProject}" method="get">
+              <input type="text" name="taskId" id="connect-new-id" value="" hidden>
+              <input type="text" name="title" id="connect-new-title" value="" hidden>
+              <button class="btn btn-link text-secondary" name="connect" value="new">新規プロジェクトとして切り離す</button>
+            </form>
+            <form th:action="@{connectProject}" method="get">
+              <input type="text" name="taskId" id="connect-old-id" value="" hidden>
+              <input type="text" name="title" id="connect-old-title" value="" hidden>
+              <button class="btn btn-link text-secondary" name="connect" value="old">サブタスクに別プロジェクトを繋げる</button>
+            </form>
+          </div>
+          <div th:if="${uri == '/overview'}" id="disconnect-button" class="text-center my-3 d-flex flex-column">
+            <button type="button" class="btn btn-link text-secondary" data-bs-toggle="modal" data-bs-target="#disconnectModal" value="disconnect">
+              プロジェクトを切り離す
+            </button>
+            <button type="button" class="btn btn-link text-secondary" data-bs-toggle="modal" data-bs-target="#disconnectModal" value="merge">
+              プロジェクトを結合する
+            </button>
+          </div>
+            
+
+
+
+          <div class="col-12 nav-heading justify-content-end">
+            <div class="d-flex justify-content-end align-items-center">
+              <label class="me-2">作成日時</label>
+              <input
+                type="datetime-local"
+                class="form-control-plaintext w-32"
+                id="form-created-at"
+                disabled
+              />
+            </div>
+            <div class="d-flex justify-content-end align-items-center">
+              <label class="me-2">更新日時</label>
+              <input
+                type="datetime-local"
+                class="form-control-plaintext w-32"
+                id="form-updated-at"
+                disabled
+              />
+            </div>
+            <div
+              class="d-flex justify-content-end align-items-center d-none"
+              id="form-completed-at-div"
+            >
+              <label class="me-2">完了日時</label>
+              <input
+                type="datetime-local"
+                class="form-control-plaintext w-32"
+                id="form-completed-at"
+                disabled
+              />
+            </div>
+          </div>
+          <form th:action="@{/project}" id="disconnect-form" method="post" hidden>
+            <input type="text" id="disconnect-task-id" name="taskId">
+            <input type="text" id="disconnect-form-params" name="" value="">
+          </form>
+          <form th:action="@{/task}" method="post" hidden>
+            <input type="text" id="hidden-form-task-id" name="taskId" />
+            <input
+              type="text"
+              id="hidden-form-owner-id"
+              name="ownerId"
+              disabled
+            />
+            <textarea
+              name="comment"
+              id="hidden-form-comment"
+              disabled
+            ></textarea>
+            <button type="submit" id="hidden-form-submit"></button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

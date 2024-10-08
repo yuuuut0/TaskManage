@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <div th:fragment="alert">
+      <div
+          class="alert alert-danger alert-dismissible fade show d-flex align-items-center mt-3"
+          role="alert"
+          th:if="${error != null}"
+        >
+          <div th:text="${error}"></div>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div
+          class="alert alert-dismissible fade show d-flex align-items-center mt-3"
+          role="alert"
+          th:if="${alert != null}"
+          th:classappend="${alert?.isError ? 'alert-danger' : 'alert-info'}"
+        >
+          <i class="bi me-2" th:classappend="${alert.isError ? 'bi-x-circle' : 'bi-check-lg'}"></i>
+          <div th:text="${alert.message}"></div>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+    </div>
+  </body>
+</html>

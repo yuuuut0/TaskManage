@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <div class="d-flex" th:fragment="nestingTask(task, parentTask, first, last)">
+      <div
+        class="border-bottom border-2 sticky-top mb-line"
+        th:classappend="${first ? '' : (last ? 'border-start' : '')}"
+        style="height: 1.6rem; width: 1.6rem"
+      ></div>
+      <a
+        th:id="${task.task.taskId}"
+        type="button"
+        class="card rounded-5 d-inline-block sticky-top text-decoration-none task-info-btn  mb-2"
+        style="height: 3rem"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#offcanvasScrolling"
+        aria-controls="offcanvasScrolling"
+        th:classappend="${(user.userId == task.task.assignedUser?.userId ? 'my-card ' : '')
+          + (first && last ? 'card-top card-last' : (first ? 'card-top' : (last ? 'card-last' : '')))}"
+        th:attr="
+            data-task-id=${task.task.taskId},
+            data-title=${task.task.title},
+            data-description=${task.task.description},
+            data-assigned-user-id=${task.task.assignedUser != null ? task.task.assignedUser.userId : ''},
+            data-assigned-user-name=${task.task.assignedUser != null ? task.task.assignedUser.username : 'free'},
+            data-priority=${task.task.priority},
+            data-deadline=${task.task.deadline},
+            data-sub-completed=${task.task.subCompleted},
+            data-sub-total=${task.task.subTotal},
+            data-submit-flg=${task.task.submitFlg},
+            data-completed-flg=${task.task.completedFlg},
+            data-connect-flg=${task.task.connectFlg},
+            data-parent-title=${parentTask.title},
+            data-owner-id=${parentTask.assignedUser != null ? parentTask.assignedUser.userId : ''},
+            data-owner-name=${parentTask.assignedUser != null ? parentTask.assignedUser.username : 'free'},
+            data-created-at=${task.task.createdAt},
+            data-updated-at=${task.task.updatedAt},
+            data-completed-at=${task.task.completedAt}
+          "
+      >
+        <div class="card-body d-flex progress-background py-07">
+          <div class="progress rounded-5">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              th:style="'width: ' + ${task.progress} + '%;'"
+              th:attr="aria-valuenow=${task.progress}"
+              th:classappend="${task.isWarning ? 'bg-warning' : ''}"
+            ></div>
+          </div>
+          <div class="content mx-2">
+            <div class="content-title text-nowrap" th:text="${task.task.title}">
+              タイトル
+            </div>
+          </div>
+          <div class="vr mx-2"></div>
+          <div
+            class="text-secondary text-nowrap px-2"
+            th:text="${task.task.assignedUser != null ? memberMap[task.task.assignedUser.userId] : 'free'}"
+          >
+            ハンドルネーム
+          </div>
+        </div>
+      </a>
+      <div
+        class="border-bottom border-2 sticky-top mb-line"
+        style="height: 1.6rem; width: 1.6rem; --bs-border-style: dotted;"
+        th:if="${task.task.connectFlg}"
+      ></div>
+      <div
+        class="border-bottom border-2 sticky-top mb-line"
+        style="height: 1.6rem; width: 1.6rem"
+        th:if="${!task.subTaskList.isEmpty}"
+      >
+        <a
+          class="position-relative text-body-tertiary"
+          data-bs-toggle="collapse"
+          th:href="|#${task.task.taskId}Collapse|"
+          role="button"
+          aria-expanded="false"
+          th:aria-controls="|${task.task.taskId}Collapse|"
+          style="text-decoration: none; top: calc(0.7rem + 1px); left: 0.3rem;"
+        >
+        <i class="bi bi-dash-circle bg-white"></i>
+        </a>
+      </div>
+      <div class="border-start-container position-relative collapse show" th:id="|${task.task.taskId}Collapse|">
+        <div class="border-start border-2 position-absolute"></div>
+        <div th:each="subTask, iterStat: ${task.subTaskList}">
+          <div
+            th:replace="~{this :: nestingTask(${subTask}, ${task.task}, ${iterStat.first}, ${iterStat.last})}"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
