@@ -7,7 +7,6 @@ CREATE TABLE `users` (
   `project_id` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   KEY `project_id_idx` (`project_id`),
-  CONSTRAINT `users.project_id` FOREIGN KEY (`project_id`) REFERENCES `projects` (`project_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `tasks` (
@@ -32,7 +31,6 @@ CREATE TABLE `tasks` (
   KEY `project_id_idx` (`project_id`) /*!80000 INVISIBLE */,
   KEY `idx_parent_id` (`parent_id`),
   CONSTRAINT `assigned_user_id` FOREIGN KEY (`assigned_user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `tasks.project_id` FOREIGN KEY (`project_id`) REFERENCES `projects` (`project_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=187 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `projects` (
