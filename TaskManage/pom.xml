@@ -32,6 +32,9 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+    <flyway.url>${JAWSDB_URL:jdbc:mysql://localhost/task_manage}</flyway.url>
+    <flyway.user>${JAWSDB_USERNAME:yuto}</flyway.user>
+    <flyway.password>${JAWSDB_PASSWORD:1010}</flyway.password>
 	</properties>
 	<dependencies>
 		<dependency>
