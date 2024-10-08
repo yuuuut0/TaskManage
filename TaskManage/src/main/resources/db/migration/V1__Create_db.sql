@@ -8,7 +8,7 @@ CREATE TABLE `users` (
   PRIMARY KEY (`user_id`),
   KEY `project_id_idx` (`project_id`),
   CONSTRAINT `users.project_id` FOREIGN KEY (`project_id`) REFERENCES `projects` (`project_id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `tasks` (
   `task_id` int NOT NULL AUTO_INCREMENT,
@@ -21,7 +21,7 @@ CREATE TABLE `tasks` (
   `submit_flg` tinyint(1) NOT NULL DEFAULT '0',
   `completed_flg` tinyint(1) NOT NULL DEFAULT '0',
   `connect_flg` tinyint(1) NOT NULL DEFAULT '0',
-  `priority` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1:なし\n2:早急\n3:重要\n4:緊急',
+  `priority` tinyint unsigned NOT NULL DEFAULT '1',
   `deadline` datetime DEFAULT NULL,
   `project_id` varchar(50) DEFAULT NULL,
   `created_at` datetime NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE `tasks` (
   KEY `idx_parent_id` (`parent_id`),
   CONSTRAINT `assigned_user_id` FOREIGN KEY (`assigned_user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `tasks.project_id` FOREIGN KEY (`project_id`) REFERENCES `projects` (`project_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=187 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=187 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `projects` (
   `project_id` varchar(50) NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE `projects` (
   PRIMARY KEY (`project_id`),
   KEY `first_task_id` (`first_task_id`),
   CONSTRAINT `first_task_id` FOREIGN KEY (`first_task_id`) REFERENCES `tasks` (`task_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 ALTER TABLE `users`
   ADD CONSTRAINT `users.project_id` FOREIGN KEY (`project_id`) REFERENCES `projects` (`project_id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -64,7 +64,7 @@ CREATE TABLE `user_projects` (
   KEY `idx_project_id` (`project_id`,`user_id`),
   CONSTRAINT `project_id` FOREIGN KEY (`project_id`) REFERENCES `projects` (`project_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `task_approvals` (
   `approval_id` int NOT NULL AUTO_INCREMENT,
@@ -88,4 +88,4 @@ CREATE TABLE `task_approvals` (
   CONSTRAINT `assignee` FOREIGN KEY (`assignee_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `project` FOREIGN KEY (`project_id`) REFERENCES `projects` (`project_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `task` FOREIGN KEY (`task_id`) REFERENCES `tasks` (`task_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
