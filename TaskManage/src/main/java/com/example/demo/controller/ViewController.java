@@ -24,7 +24,8 @@ public class ViewController {
 
 	private final ViewService viewService;
 	
-	@GetMapping("/login")
+	
+	@GetMapping({"/login", "/"})
 	public String login(Model model, LoginForm form) {
 		return "login";
 	}
