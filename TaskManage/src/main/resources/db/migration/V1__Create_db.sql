@@ -6,7 +6,7 @@ CREATE TABLE `users` (
   `last_active_at` datetime NOT NULL,
   `project_id` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
-  KEY `project_id_idx` (`project_id`),
+  KEY `project_id_idx` (`project_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `tasks` (
@@ -30,7 +30,7 @@ CREATE TABLE `tasks` (
   KEY `assigned_user_id_idx` (`assigned_user_id`),
   KEY `project_id_idx` (`project_id`) /*!80000 INVISIBLE */,
   KEY `idx_parent_id` (`parent_id`),
-  CONSTRAINT `assigned_user_id` FOREIGN KEY (`assigned_user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `assigned_user_id` FOREIGN KEY (`assigned_user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=187 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `projects` (
