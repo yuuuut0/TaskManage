@@ -95,7 +95,7 @@ public class ViewService {
 			var parentTaskList = taskDao.findAllById(parentIdList);
 			if(nowProjectInfo.getLeaderId().equals(userId) && !parentTaskList.contains(firstTask)) {
 				parentTaskList = new ArrayList<Task>(parentTaskList);
-				parentTaskList.addFirst(firstTask);
+				parentTaskList.add(0, firstTask);
 			}
 			baseDto.setParentTaskLabel(parentTaskList);			
 		}

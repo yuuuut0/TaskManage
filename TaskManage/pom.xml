@@ -109,6 +109,11 @@
 		    <artifactId>bootstrap-icons</artifactId>
 		    <version>1.11.3</version>
 		</dependency>
+		<!--	flyway	-->
+		<dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-mysql</artifactId>
+    </dependency>
 		<dependency>
 		    <groupId>org.flywaydb</groupId>
 		    <artifactId>flyway-core</artifactId>
@@ -125,13 +130,20 @@
 						<exclude>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<source>1.8</source>
-              <target>1.8</target>
-              <encoding>UTF-8</encoding>
 						</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+            <source>1.8</source>
+            <target>1.8</target>
+            <encoding>UTF-8</encoding>
+        </configuration>
+    	</plugin>
 		</plugins>
 	</build>
 
