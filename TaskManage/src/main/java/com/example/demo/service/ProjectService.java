@@ -60,6 +60,7 @@ public class ProjectService {
 		
 		firstTask.setTitle(form.getFirstTask());
 		firstTask.setDescription(form.getFirstTaskDescription());
+		firstTask.setDeadline(form.getDeadline());
 		firstTask.setAssignedUser(assignedUser);
 		firstTask.setCreatedAt(LocalDateTime.now());
 		firstTask.setUpdatedAt(LocalDateTime.now());
