@@ -64,11 +64,12 @@ https://todo-flow-36bc64b25c1e.herokuapp.com/
 <br />
 
 ## ER図
-メインの`projects` `tasks` `users`テーブルの相関図
-![ER図](TaskManage/er%E5%9B%B3/er%E5%9B%B3%E3%80%80%E5%85%A8%E4%BD%93.png)
+#### メインの`projects` `tasks` `users`テーブルの相関図
+![ER図](TaskManage/er_view/er_main.png)
+
 <br>
-<br>
-承認機能関連を含めた全体図
-![ER図](TaskManage/er%E5%9B%B3/er%E5%9B%B3%E3%80%80%E5%85%A8%E4%BD%93.png)
+
+#### 承認機能関連を含めた全体図
+![ER図](TaskManage/er_view/er_all.png)
 
 <br />
