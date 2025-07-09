@@ -27,12 +27,12 @@ https://todo-flow-36bc64b25c1e.herokuapp.com/
 ## 機能一覧
 | トップ画面 |　overview画面 |
 | ---- | ---- |
-| <img src="/docs/img/home.png" alt="トップ画面" width="100%" /> | <img src="/docs/img/overview.png" alt="overview画面" width="100%" /> |
+| <img src="/docs/img/home.png" alt="トップ画面" width="500" /> | <img src="/docs/img/overview.png" alt="overview画面" width="500" /> |
 | 自分の担当タスクが親タスク毎にカテゴライズされて一覧表示。<br> 各タスクの直下のサブタスクも確認可能。| プロジェクト内の全てのタスクをフローチャート形式で表示。<br>クリックでタスク詳細表示、編集可能<br>任意の位置からプロジェクトの分離、結合が可能 |
 
 | Approval画面 |　free画面 |
 | ---- | ---- |
-| <img src="/docs/img/approval.png" alt="approval画面" width="100%" /> | <img src="/docs/img/free.png" alt="free画面" width="100%" /> |
+| <img src="/docs/img/approval.png" alt="approval画面" width="500" /> | <img src="/docs/img/free.png" alt="free画面" width="500" /> |
 | タスクの承認処理を行う。<br>承認されないと承認必須のタスクは完了にならない。<br>過去の承認履歴が確認可能。 | 担当者が決まっていないタスクが一覧表示される。<br>ワンクリックでタスクを受け持つことができる。 |
 
 ### その他機能
@@ -65,11 +65,11 @@ https://todo-flow-36bc64b25c1e.herokuapp.com/
 
 ## ER図
 #### メインの`projects` `tasks` `users`テーブルの相関図
-![ER図](TaskManage/er_view/er_main.png)
+![ER図](docs/img/er_view/er_main.png)
 
 <br>
 
 #### 承認機能関連を含めた全体図
-![ER図](TaskManage/er_view/er_all.png)
+![ER図](docs/img/er_view/er_all.png)
 
 <br />
