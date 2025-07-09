@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>TaskFlow</title>
+  </head>
+
+  <body>
+    <div th:insert="~{common/sourceList :: sourceList}"></div>
+    <div th:replace="~{common/header :: header}"></div>
+    <div th:insert="~{common/sidebar :: sidebar}"></div>
+    <!-- 
+	
+	main
+	
+	-->
+    <main class="" id="main">
+      <div class="container-fluid p-3">
+        <div class="fs-3 my-4 text-secondary text-center">ユーザー設定画面</div>
+        <div th:replace="~{common/alert :: alert}"></div>
+
+          <div class="row mb-3">
+            <div class="col-5 modal-label text-end"
+              >user ID</div
+            >
+            <div class="col-3">
+              <input
+                type="text"
+                class="form-control-plaintext"
+                th:value="${user.userId}"
+                disabled
+              />
+            </div>
+          </div>
+        <form th:action="@{/user}" method="post">
+          <div class="row mb-3">
+            <label for="set-username" class="col-5 modal-label text-end"
+              >username</label
+            >
+            <div class="col-3">
+              <input
+                type="text"
+                class="form-control-plaintext"
+                id="set-username"
+                name="setString"
+                th:value="${user.username}"
+                disabled
+                data-input-id="username"
+                required
+                maxlength="30"
+              />
+            </div>
+            <div class="col-1">
+              <button
+                type="button"
+                class="btn user-toggle"
+                data-input-id="username"
+              >
+                <i class="bi bi-pencil-square text-secondary"></i>
+              </button>
+            </div>
+            <div class="col-2">
+              <button
+                class="btn btn-outline-secondary"
+                data-btn-id="username"
+                hidden
+                name="set"
+                value="username"
+              >
+                変更
+              </button>
+            </div>
+          </div>
+        </form>
+        <div class="row mb-3">
+          <div class="col-5 modal-label text-end">now project</div>
+          <div class="col-3">
+            <input
+              type="text"
+              class="form-control-plaintext"
+              th:value="${nowProjectInfo !=  null ? nowProjectInfo.name : ''}"
+              disabled
+            />
+          </div>
+        </div>
+        <div th:if="${nowProjectInfo != null}">
+          <form th:action="@{/user}" method="post">
+            <div class="row mb-3">
+              <label for="set-handle" class="col-5 modal-label text-end"
+                >handle</label
+              >
+              <div class="col-3">
+                <input
+                  type="text"
+                  name="projectId"
+                  th:value="${nowProjectInfo.projectId}"
+                  hidden
+                />
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="set-handle"
+                  name="setString"
+                  th:value="${user.handle}"
+                  disabled
+                  data-input-id="handle"
+                  required
+                  maxlength="4"
+                />
+              </div>
+              <div class="col-1">
+                <button
+                  type="button"
+                  class="btn user-toggle"
+                  data-input-id="handle"
+                >
+                  <i class="bi bi-pencil-square text-secondary"></i>
+                </button>
+              </div>
+              <div class="col-2">
+                <button
+                  class="btn btn-outline-secondary"
+                  data-btn-id="handle"
+                  hidden
+                  name="set"
+                  value="handle"
+                >
+                  変更
+                </button>
+              </div>
+            </div>
+          </form>
+          <div class="text-center mt-5 pt-5">
+            <a
+              class="text-secondary mb-3"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#userExitModal"
+            >
+              projectから外れる
+            </a>
+          </div>
+        </div>
+        <div class="text-center">
+          <a
+            class="text-secondary mb-3"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#userDeleteModal"
+          >
+            アカウント削除
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <div
+      class="modal fade"
+      id="userExitModal"
+      aria-hidden="true"
+      tabindex="-1"
+      th:if="${nowProjectInfo != null}"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">※注意</h1>
+          </div>
+          <div class="modal-body">
+            抜ける際、プロジェクト内のすべての担当から外れます。<br>
+            <br>
+            また、あなたがこのプロジェクトのリーダーの場合、プロジェクトは削除されます。
+          </div>
+          <div class="modal-footer d-flex justify-content-between">
+            <form th:action="@{/user}" method="post">
+              <input type="text" name="projectId" th:value="${nowProjectInfo.projectId}" hidden>
+              <button class="btn btn-outline-danger" name="exit">
+                プロジェクトを外れる
+              </button>
+            </form>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-target="#userExitModal"
+              data-bs-toggle="modal"
+            >
+              close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="userDeleteModal"
+      aria-hidden="true"
+      tabindex="-1"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">※注意</h1>
+          </div>
+          <div class="modal-body">
+            あなたがリーダーであるprojectは削除されます。<br />
+            また、各projectにおいてあなたのタスクの担当から外れます。
+          </div>
+          <div class="modal-footer d-flex justify-content-between">
+            <form th:action="@{/user}" method="post">
+              <button class="btn btn-outline-danger" name="delete">アカウント削除</button>
+            </form>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-target="#userDeleteModal"
+              data-bs-toggle="modal"
+            >
+              close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script th:src="@{/main.js}"></script>
+  </body>
+</html>
