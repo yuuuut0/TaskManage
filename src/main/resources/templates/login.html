@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TaskFlow</title>
+  </head>
+
+  <body>
+    <div th:insert="~{common/sourceList :: sourceList}"></div>
+    <div class="container-fluid">
+      <div class="row">
+        <div
+          class="col-12 col-md-7 vh-100 scrollable-height overflow-auto pt-3 px-3 bg-body-secondary"
+        >
+          <!-- アプリタイトルと紹介 -->
+          <div class="text-center mb-3">
+            <h2 class="my-5 fs-1">TaskFlow</h2>
+            <div class="fs-5">シンプルなタスク管理ツール</div>
+          </div>
+
+          <!-- 機能紹介セクション -->
+
+          <div class="text-center mb-5">
+            <h6
+              data-bs-toggle="collapse"
+              data-bs-target="#features"
+              aria-expanded="false"
+              aria-controls="features"
+              style="cursor: pointer"
+            >
+              <i class="bi bi-chevron-down me-1"></i>
+              機能紹介
+            </h6>
+          </div>
+
+          <!-- 機能紹介内容 -->
+          <div class="collapse text-center" id="features">
+
+						<div class="mb-3">
+							<i class="bi bi-star-fill me-2 text-secondary"></i>
+							特に見てほしい機能
+						</div>
+
+            <div class="mb-4">
+              <h6 class="fs-5">概要</h6>
+              <ul class="list-unstyled">
+                <li>
+                  プロジェクトごとに
+                  <code>firstTask</code>
+                  が存在し、プロジェクト内のタスクはすべてこの
+                  <code>firstTask</code> につながります。
+                </li>
+                <li>ユーザーは複数のプロジェクトに参加することが可能です。</li>
+                <li>
+									<i class="bi bi-star-fill me-2 text-secondary"></i>
+									完了は連鎖的に広がります（サブタスクがすべて完了するとそのタスクも完了済みになる）
+								</li>
+              </ul>
+            </div>
+
+            <div class="mb-4">
+              <h6 class="fs-5">MyTaskページ</h6>
+              <ul class="list-unstyled">
+                <li>プロジェクト内の自身の担当タスクが一覧表示されます。</li>
+                <li>担当タスクの直下にあるサブタスクも確認できます。</li>
+                <li>
+                  タスク作成ボタンを押すことで、自動的に親タスクがセットされます。
+                </li>
+              </ul>
+            </div>
+
+            <div class="mb-4">
+              <h6 class="fs-5">Overflowページ</h6>
+              <ul class="list-unstyled">
+                <li>
+									<i class="bi bi-star-fill me-2 text-secondary"></i>
+                  プロジェクトに含まれるタスクをフローチャート形式で表示します。
+                </li>
+                <li>
+									<i class="bi bi-star-fill me-2 text-secondary"></i>
+                  任意の地点からのタスクを受け継いで新規プロジェクトを作成できます。
+                </li>
+                <li>
+									<i class="bi bi-star-fill me-2 text-secondary"></i>
+									既存のプロジェクトを繋げることも可能です。
+								</li>
+              </ul>
+            </div>
+
+            <div class="mb-4">
+              <h6 class="fs-5">Approvalページ</h6>
+              <ul class="list-unstyled">
+                <li>
+									<i class="bi bi-star-fill me-2 text-secondary"></i>
+                  サブタスクに提出を求める設定を行うことで、このページで承認しない限り、サブタスクは完了になりません。
+                </li>
+                <li>
+									<i class="bi bi-star-fill me-2 text-secondary"></i>
+									自身の担当タスクの過去の承認結果を確認できます。
+								</li>
+              </ul>
+            </div>
+
+            <div class="mb-5">
+              <h6 class="fs-5">Freeページ</h6>
+              <ul class="list-unstyled">
+                <li>担当が決まっていないタスクが一覧表示されます。</li>
+                <li>ワンクリックで自分の担当にすることができます。</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- デモログイン情報 -->
+          <div class="text-center mb-5">
+            <div class="mb-2">
+              デモユーザーでログインして機能をお試しください。
+            </div>
+            <div>デモユーザー :<span class="fw-medium"> testuser</span></div>
+            <div>パスワード :<span class="fw-medium"> pass</span></div>
+          </div>
+
+          <!-- 注意書き -->
+          <div class="text-center mb-5">
+            <h6 class="mb-3">注意事項</h6>
+            <ul class="list-unstyled">
+              <li class="mb-1">機密情報や個人情報は書き込まないでください。</li>
+              <li>開発者モードや正規の手順以外での変更は避けてください。</li>
+            </ul>
+          </div>
+
+          <!-- 技術スタックの紹介 -->
+          <div class="text-center mb-5">
+            <h6
+              data-bs-toggle="collapse"
+              data-bs-target="#techStack"
+              aria-expanded="false"
+              aria-controls="techStack"
+              style="cursor: pointer"
+            >
+              <i class="bi bi-chevron-down me-1"></i>
+              技術スタック
+            </h6>
+          </div>
+
+          <div class="collapse" id="techStack">
+            <!-- バックエンド -->
+            <div class="d-flex justify-content-center mb-3">
+              <h6 class="me-3 mt-1">バックエンド</h6>
+              <ul class="list-unstyled">
+                <li>Spring Boot</li>
+                <li>Spring Security</li>
+                <li>ModelMapper</li>
+                <li>Flyway</li>
+              </ul>
+            </div>
+
+            <!-- フロントエンド -->
+            <div class="d-flex justify-content-center mb-3">
+              <h6 class="me-3 mt-1">フロントエンド</h6>
+              <ul class="list-unstyled">
+                <li>Thymeleaf</li>
+                <li>HTML & CSS</li>
+                <li>JavaScript</li>
+                <li>Bootstrap</li>
+              </ul>
+            </div>
+
+            <!-- データベース -->
+            <div class="d-flex justify-content-center mb-3">
+              <h6 class="me-3 mt-1">データベース</h6>
+              <ul class="list-unstyled">
+                <li>JawsDB MySQL</li>
+              </ul>
+            </div>
+
+            <!-- デプロイ -->
+            <div class="d-flex justify-content-center mb-3">
+              <h6 class="me-3 mt-1">デプロイ</h6>
+              <ul class="list-unstyled">
+                <li>Heroku</li>
+              </ul>
+            </div>
+
+            <!-- バージョン管理 -->
+            <div class="d-flex justify-content-center mb-5">
+              <h6 class="me-3 mt-1">バージョン管理</h6>
+              <ul class="list-unstyled">
+                <li>Git</li>
+                <li>GitHub</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- GitHubリンク -->
+          <div class="text-center mb-3">
+            <a
+              href="https://github.com/yuuuut0/TaskManage/tree/main"
+              target="_blank"
+              class="link-primary"
+              >GitHub リポジトリはこちら</a
+            >
+          </div>
+
+          <!-- その他の注意 -->
+          <div class="text-center text-muted mt-2 mb-5">
+            <small
+              >テストユーザー以外のデータは削除される場合があります。</small
+            >
+          </div>
+        </div>
+        <div
+          class="col-12 col-md-5 d-flex justify-content-center align-items-center vh-100"
+        >
+          <div class="col-8">
+            <div th:replace="~{common/alert :: alert}"></div>
+            <h4 class="text-center">ログイン</h4>
+            <div class="row justify-content-center">
+              <form
+                class="col-6 col-md-8 col-lg-6"
+                th:action="@{/login}"
+                method="post"
+                th:object="${loginForm}"
+              >
+                <div class="form-group">
+                  <div class="mb-3">
+                    <p>
+                      <label class="form-label" for="userId">userID</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        th:field="*{userId}"
+                      />
+                    </p>
+                  </div>
+                  <div class="mb-3">
+                    <p>
+                      <label class="form-label" for="password">password</label>
+                      <input
+                        class="form-control"
+                        type="password"
+                        th:field="*{password}"
+                      />
+                    </p>
+                  </div>
+                  <p class="text-center">
+                    <input
+                      class="btn btn-primary"
+                      type="submit"
+                      value="ログイン"
+                    />
+                  </p>
+                </div>
+              </form>
+            </div>
+            <a class="d-block text-center mt-3" th:href="@{/signup}"
+              >▶ユーザー登録はこちら</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
